@@ -1,75 +1,66 @@
-# React + TypeScript + Vite
+# CyberSlide Studio — Sprint 3 Task 1
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This task adds native `.cslide` project files.
 
-Currently, two official plugins are available:
+## Replace these files
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- `electron/main.cjs`
+- `electron/preload.cjs`
+- `src/App.tsx`
 
-## React Compiler
+## Add these files
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `src/services/ProjectFileService.ts`
+- `src/types/electron.d.ts`
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Native **File → New Project**
+- Native **File → Open Project**
+- Native **File → Save**
+- Native **File → Save As**
+- Keyboard shortcuts:
+  - Ctrl+N
+  - Ctrl+O
+  - Ctrl+S
+  - Ctrl+Shift+S
+- Open and Save buttons in the application header
+- `.cslide` JSON serialization
+- Project validation and normalization when opening files
+- Existing project path tracking
+- Saved/unsaved status
+- Current file path display
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Install
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Stop the application with `Ctrl+C`.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Copy the included files into the matching locations under:
 
+```text
+C:\CyberSlideStudio
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Allow Windows to replace existing files.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Verify
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```powershell
+cd C:\CyberSlideStudio
+npm run lint
+npm run build
+npm run desktop
 ```
+
+## Manual test
+
+1. Select **File → Save As**.
+2. Save the project as `Password-Managers.cslide`.
+3. Change a slide title.
+4. Confirm the app shows **Unsaved**.
+5. Press `Ctrl+S`.
+6. Confirm the app shows **Saved**.
+7. Select **File → New Project**.
+8. Select **File → Open Project**.
+9. Reopen `Password-Managers.cslide`.
+10. Confirm the script, slides, validation, and settings are restored.

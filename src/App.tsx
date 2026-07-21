@@ -1,11 +1,17 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import "./App.css";
 import { parseCyberSlideScript } from "./parser/parseScript";
+import {
+  deserializeProject,
+  projectNameFromPath,
+  serializeProject,
+} from "./services/ProjectFileService";
 import {
   projectSlidesToScript,
   scriptToProjectSlides,
 } from "./services/ScriptService";
 import { useProjectStore } from "./state/useProjectStore";
+import type { ProjectMenuAction } from "./types/electron";
 
 type NavItem = "Scripts" | "Slides" | "Themes" | "Export" | "Settings";
 
@@ -41,13 +47,17 @@ function App() {
     selectedSlideId,
     isDirty,
     selectSlide,
+    setProject,
     setScriptAndSlides,
     createNewProject,
+    markSaved,
   } = useProjectStore();
 
   const [activeNav, setActiveNav] = useState<NavItem>("Scripts");
   const [theme, setTheme] = useState("Enterprise Cyber");
   const [layout, setLayout] = useState("Cinematic Hero");
+  const [currentFilePath, setCurrentFilePath] = useState<string | null>(null);
+  const [fileMessage, setFileMessage] = useState("Ready");
 
   const currentScript = project.script || starterScript;
   const parserResult = useMemo(
@@ -78,6 +88,83 @@ function App() {
   const validSlideCount = effectiveSlides.filter(
     (slide) => slide.validation.length === 0,
   ).length;
+
+  const projectForPersistence = useMemo(
+    () => ({
+      ...project,
+      script: currentScript,
+      slides: effectiveSlides,
+    }),
+    [project, currentScript, effectiveSlides],
+  );
+
+  const handleNewProject = useCallback(async () => {
+    createNewProject();
+    await window.cyberSlideStudio.clearCurrentProjectPath();
+    setCurrentFilePath(null);
+    setFileMessage("New project created");
+  }, [createNewProject]);
+
+  const handleOpenProject = useCallback(async () => {
+    try {
+      const result = await window.cyberSlideStudio.openProject();
+      if (!result) return;
+
+      const openedProject = deserializeProject(result.contents);
+      setProject({
+        ...openedProject,
+        name:
+          openedProject.name === "Untitled Project"
+            ? projectNameFromPath(result.filePath)
+            : openedProject.name,
+      });
+      setCurrentFilePath(result.filePath);
+      setFileMessage(`Opened ${projectNameFromPath(result.filePath)}`);
+    } catch (error) {
+      setFileMessage(
+        error instanceof Error ? error.message : "Unable to open project",
+      );
+    }
+  }, [setProject]);
+
+  const handleSaveProject = useCallback(
+    async (forceSaveAs = false) => {
+      try {
+        const contents = serializeProject(projectForPersistence);
+        const result = forceSaveAs
+          ? await window.cyberSlideStudio.saveProjectAs(
+              contents,
+              projectForPersistence.name,
+            )
+          : await window.cyberSlideStudio.saveProject(
+              contents,
+              projectForPersistence.name,
+            );
+
+        if (!result) return;
+
+        setCurrentFilePath(result.filePath);
+        markSaved();
+        setFileMessage(`Saved ${projectNameFromPath(result.filePath)}`);
+      } catch (error) {
+        setFileMessage(
+          error instanceof Error ? error.message : "Unable to save project",
+        );
+      }
+    },
+    [markSaved, projectForPersistence],
+  );
+
+  useEffect(() => {
+    return window.cyberSlideStudio.onProjectMenuAction(
+      (action: ProjectMenuAction) => {
+        if (action === "new") void handleNewProject();
+        if (action === "open") void handleOpenProject();
+        if (action === "save") void handleSaveProject(false);
+        if (action === "saveAs") void handleSaveProject(true);
+      },
+    );
+  }, [handleNewProject, handleOpenProject, handleSaveProject]);
 
   const handleScriptChange = (script: string) => {
     const result = scriptToProjectSlides(script, effectiveSlides);
@@ -145,6 +232,16 @@ function App() {
         </nav>
 
         <div className="topbar-actions">
+          <button className="ghost-button" type="button" onClick={handleOpenProject}>
+            Open
+          </button>
+          <button
+            className="secondary-button"
+            type="button"
+            onClick={() => void handleSaveProject(false)}
+          >
+            Save
+          </button>
           <span
             className={issueCount ? "status-dot warning" : "status-dot"}
             aria-hidden="true"
@@ -168,14 +265,14 @@ function App() {
             <button
               className="ghost-button"
               type="button"
-              onClick={() => createNewProject()}
+              onClick={() => void handleNewProject()}
             >
               New
             </button>
           </div>
 
           <div className="script-toolbar">
-            <span>Project is source of truth</span>
+            <span>{currentFilePath ?? "Not saved to disk"}</span>
             <span className="toolbar-divider" />
             <span>{wordCount} words</span>
           </div>
@@ -190,7 +287,7 @@ function App() {
 
           <div className="editor-footer">
             <span>{currentScript.length} characters</span>
-            <span className="live-parser-badge">STORE</span>
+            <span className="live-parser-badge">.CSLIDE</span>
           </div>
         </aside>
 
@@ -411,8 +508,8 @@ function App() {
       </main>
 
       <footer className="statusbar">
-        <span>CyberSlide Studio v0.5.0</span>
-        <span>ProjectStore connected</span>
+        <span>CyberSlide Studio v0.6.0</span>
+        <span>{fileMessage}</span>
         <span>{isDirty ? "Unsaved project changes" : "Project saved"}</span>
       </footer>
     </div>
