@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
 import "./App.css";
+import { parseCyberSlideScript } from "./parser/parseScript";
 import {
-  parseCyberSlideScript,
-  type ParsedSlide,
-} from "./parser/parseScript";
+  projectSlidesToScript,
+  scriptToProjectSlides,
+} from "./services/ScriptService";
+import { useProjectStore } from "./state/useProjectStore";
 
 type NavItem = "Scripts" | "Slides" | "Themes" | "Export" | "Settings";
 
@@ -19,6 +21,8 @@ No—you don't have to remember 200 different passwords.
 
 Slide 2
 
+Title:
+
 Body:
 Many people reuse passwords because it's easier. Unfortunately, if one website suffers a data breach, attackers often try that same password on other accounts.
 
@@ -30,46 +34,83 @@ Use a Password Manager
 Body:
 A password manager generates long, unique passwords and stores them securely, so you only need to remember one strong master password.`;
 
-const emptySlide: ParsedSlide = {
-  id: "empty-slide",
-  number: 1,
-  title: "",
-  body: "",
-  cta: "",
-  notes: "",
-  issues: [],
-  isValid: false,
-};
-
 function App() {
-  const [activeNav, setActiveNav] = useState<NavItem>("Scripts");
-  const [script, setScript] = useState(starterScript);
-  const parsed = useMemo(() => parseCyberSlideScript(script), [script]);
-  const slides = parsed.slides;
+  const {
+    project,
+    selectedSlide,
+    selectedSlideId,
+    isDirty,
+    selectSlide,
+    setScriptAndSlides,
+    createNewProject,
+  } = useProjectStore();
 
-  const [selectedSlideId, setSelectedSlideId] = useState(
-    () => parsed.slides[0]?.id ?? emptySlide.id
-  );
+  const [activeNav, setActiveNav] = useState<NavItem>("Scripts");
   const [theme, setTheme] = useState("Enterprise Cyber");
   const [layout, setLayout] = useState("Cinematic Hero");
 
-  const wordCount = useMemo(() => {
-    const trimmed = script.trim();
-    return trimmed ? trimmed.split(/\s+/).length : 0;
-  }, [script]);
+  const currentScript = project.script || starterScript;
+  const parserResult = useMemo(
+    () => parseCyberSlideScript(currentScript),
+    [currentScript],
+  );
 
-  const selectedSlide =
-    slides.find((slide) => slide.id === selectedSlideId) ??
-    slides[0] ??
-    emptySlide;
+  const effectiveSlides = project.script
+    ? project.slides
+    : scriptToProjectSlides(starterScript, project.slides).slides;
+
+  const activeSlide =
+    effectiveSlides.find((slide) => slide.id === selectedSlideId) ??
+    effectiveSlides[0] ??
+    selectedSlide;
+
+  const wordCount = currentScript.trim()
+    ? currentScript.trim().split(/\s+/).length
+    : 0;
 
   const issueCount =
-    parsed.globalIssues.length +
-    slides.reduce((total, slide) => total + slide.issues.length, 0);
+    parserResult.globalIssues.length +
+    effectiveSlides.reduce(
+      (total, slide) => total + slide.validation.length,
+      0,
+    );
 
-  const validSlideCount = slides.filter((slide) => slide.isValid).length;
+  const validSlideCount = effectiveSlides.filter(
+    (slide) => slide.validation.length === 0,
+  ).length;
 
-  const previewTitle = selectedSlide.title.trim().toUpperCase();
+  const handleScriptChange = (script: string) => {
+    const result = scriptToProjectSlides(script, effectiveSlides);
+    setScriptAndSlides(script, result.slides);
+  };
+
+  const handleSlideFieldChange = (
+    field: "title" | "body" | "cta" | "notes",
+    value: string,
+  ) => {
+    if (!activeSlide) return;
+
+    const updatedSlides = effectiveSlides.map((slide) =>
+      slide.id === activeSlide.id
+        ? {
+            ...slide,
+            [field]: value,
+            validation: slide.validation.filter(
+              (issue) => issue.field !== field,
+            ),
+            updatedAt: new Date().toISOString(),
+          }
+        : slide,
+    );
+
+    const preamble = parseCyberSlideScript(currentScript).ignoredPreamble;
+    const nextScript = projectSlidesToScript(updatedSlides, preamble);
+    const normalized = scriptToProjectSlides(nextScript, updatedSlides);
+
+    setScriptAndSlides(nextScript, normalized.slides);
+  };
+
+  const previewTitle = activeSlide?.title.trim().toUpperCase() ?? "";
 
   return (
     <div className="app-shell">
@@ -82,7 +123,9 @@ function App() {
           </div>
           <div>
             <div className="brand-title">CyberSlide Studio</div>
-            <div className="brand-subtitle">AI Cybersecurity Content Studio</div>
+            <div className="brand-subtitle">
+              {project.name} {isDirty ? "• Unsaved" : "• Saved"}
+            </div>
           </div>
         </div>
 
@@ -97,7 +140,7 @@ function App() {
               >
                 {item}
               </button>
-            )
+            ),
           )}
         </nav>
 
@@ -107,7 +150,7 @@ function App() {
             aria-hidden="true"
           />
           <span className="status-text">
-            {slides.length} slides · {issueCount} issues
+            {effectiveSlides.length} slides · {issueCount} issues
           </span>
           <button className="primary-button" type="button">
             Generate Slides
@@ -119,35 +162,35 @@ function App() {
         <aside className="left-panel panel">
           <div className="panel-heading">
             <div>
-              <p className="eyebrow">SCRIPT WORKSPACE</p>
+              <p className="eyebrow">PROJECT STORE</p>
               <h1>Content Script</h1>
             </div>
             <button
               className="ghost-button"
               type="button"
-              onClick={() => setScript("")}
+              onClick={() => createNewProject()}
             >
               New
             </button>
           </div>
 
           <div className="script-toolbar">
-            <span>Live parsing enabled</span>
+            <span>Project is source of truth</span>
             <span className="toolbar-divider" />
             <span>{wordCount} words</span>
           </div>
 
           <textarea
             className="script-editor"
-            value={script}
-            onChange={(event) => setScript(event.target.value)}
+            value={currentScript}
+            onChange={(event) => handleScriptChange(event.target.value)}
             spellCheck={false}
             aria-label="CyberSlide script editor"
           />
 
           <div className="editor-footer">
-            <span>{script.length} characters</span>
-            <span className="live-parser-badge">LIVE</span>
+            <span>{currentScript.length} characters</span>
+            <span className="live-parser-badge">STORE</span>
           </div>
         </aside>
 
@@ -156,11 +199,12 @@ function App() {
             <div>
               <p className="eyebrow">LIVE PREVIEW</p>
               <h2>
-                Slide {selectedSlide.number} of {Math.max(slides.length, 1)}
+                Slide {activeSlide?.number ?? 1} of{" "}
+                {Math.max(effectiveSlides.length, 1)}
               </h2>
             </div>
 
-            <div className="zoom-control" aria-label="Preview zoom">
+            <div className="zoom-control">
               <button type="button">−</button>
               <span>38%</span>
               <button type="button">+</button>
@@ -188,12 +232,12 @@ function App() {
                     ))}
                 </h3>
 
-                <p className={!selectedSlide.body ? "missing-content" : ""}>
-                  {selectedSlide.body || "Missing Body"}
+                <p className={!activeSlide?.body ? "missing-content" : ""}>
+                  {activeSlide?.body || "Missing Body"}
                 </p>
 
-                {selectedSlide.cta && (
-                  <div className="slide-cta">{selectedSlide.cta}</div>
+                {activeSlide?.cta && (
+                  <div className="slide-cta">{activeSlide.cta}</div>
                 )}
 
                 <div className="slide-accent-line" />
@@ -206,16 +250,20 @@ function App() {
           </div>
 
           <div className="slide-strip">
-            {slides.map((slide) => (
+            {effectiveSlides.map((slide) => (
               <button
                 key={slide.id}
                 className={
-                  selectedSlide.id === slide.id
-                    ? `thumbnail active ${slide.isValid ? "" : "has-warning"}`
-                    : `thumbnail ${slide.isValid ? "" : "has-warning"}`
+                  activeSlide?.id === slide.id
+                    ? `thumbnail active ${
+                        slide.validation.length ? "has-warning" : ""
+                      }`
+                    : `thumbnail ${
+                        slide.validation.length ? "has-warning" : ""
+                      }`
                 }
                 type="button"
-                onClick={() => setSelectedSlideId(slide.id)}
+                onClick={() => selectSlide(slide.id)}
               >
                 <span className="thumbnail-number">
                   {String(slide.number).padStart(2, "0")}
@@ -225,73 +273,57 @@ function App() {
                 </span>
               </button>
             ))}
-
-            {!slides.length && (
-              <div className="empty-strip-message">
-                Start the script with “Slide 1”.
-              </div>
-            )}
           </div>
         </section>
 
         <aside className="right-panel panel validation-panel">
           <div className="panel-heading compact">
             <div>
-              <p className="eyebrow">PARSER RESULTS</p>
-              <h2>Validation</h2>
+              <p className="eyebrow">PROJECT VALIDATION</p>
+              <h2>Slide Inspector</h2>
             </div>
-            <span className={issueCount ? "validation-summary warning" : "validation-summary"}>
-              {validSlideCount}/{slides.length || 0} valid
+            <span
+              className={
+                issueCount
+                  ? "validation-summary warning"
+                  : "validation-summary"
+              }
+            >
+              {validSlideCount}/{effectiveSlides.length || 0} valid
             </span>
           </div>
 
-          {parsed.ignoredPreamble.length > 0 && (
-            <div className="ignored-preamble">
-              <strong>Preamble ignored</strong>
-              <span>
-                {parsed.ignoredPreamble.length} line
-                {parsed.ignoredPreamble.length === 1 ? "" : "s"} before Slide 1
-              </span>
-            </div>
-          )}
-
-          {parsed.globalIssues.map((issue) => (
-            <div className="global-error" key={issue.message}>
-              <span>✕</span>
-              <div>
-                <strong>Script Error</strong>
-                <p>{issue.message}</p>
-              </div>
-            </div>
-          ))}
-
           <div className="validation-list">
-            {slides.map((slide) => (
+            {effectiveSlides.map((slide) => (
               <button
                 key={slide.id}
                 type="button"
                 className={
-                  selectedSlide.id === slide.id
+                  activeSlide?.id === slide.id
                     ? "validation-item selected"
                     : "validation-item"
                 }
-                onClick={() => setSelectedSlideId(slide.id)}
+                onClick={() => selectSlide(slide.id)}
               >
-                <div className={slide.isValid ? "validation-icon ok" : "validation-icon warn"}>
-                  {slide.isValid ? "✓" : "!"}
+                <div
+                  className={
+                    slide.validation.length
+                      ? "validation-icon warn"
+                      : "validation-icon ok"
+                  }
+                >
+                  {slide.validation.length ? "!" : "✓"}
                 </div>
                 <div className="validation-copy">
                   <strong>
                     Slide {slide.number}: {slide.title || "Untitled"}
                   </strong>
-                  {slide.isValid ? (
-                    <span>Ready for rendering</span>
-                  ) : (
-                    slide.issues.map((issue) => (
-                      <span key={`${issue.field}-${issue.message}`}>
-                        {issue.message}
-                      </span>
+                  {slide.validation.length ? (
+                    slide.validation.map((issue) => (
+                      <span key={issue.id}>{issue.message}</span>
                     ))
+                  ) : (
+                    <span>Ready for rendering</span>
                   )}
                 </div>
               </button>
@@ -305,11 +337,14 @@ function App() {
             <textarea
               id="slide-title"
               className={`control-textarea title-control ${
-                !selectedSlide.title ? "invalid-control" : ""
+                !activeSlide?.title ? "invalid-control" : ""
               }`}
-              value={selectedSlide.title}
+              value={activeSlide?.title ?? ""}
               placeholder="Missing Title"
-              readOnly
+              onChange={(event) =>
+                handleSlideFieldChange("title", event.target.value)
+              }
+              disabled={!activeSlide}
             />
           </div>
 
@@ -318,11 +353,28 @@ function App() {
             <textarea
               id="slide-body"
               className={`control-textarea ${
-                !selectedSlide.body ? "invalid-control" : ""
+                !activeSlide?.body ? "invalid-control" : ""
               }`}
-              value={selectedSlide.body}
+              value={activeSlide?.body ?? ""}
               placeholder="Missing Body"
-              readOnly
+              onChange={(event) =>
+                handleSlideFieldChange("body", event.target.value)
+              }
+              disabled={!activeSlide}
+            />
+          </div>
+
+          <div className="inspector-section">
+            <label htmlFor="slide-cta">CTA</label>
+            <textarea
+              id="slide-cta"
+              className="control-textarea compact-control"
+              value={activeSlide?.cta ?? ""}
+              placeholder="Optional CTA"
+              onChange={(event) =>
+                handleSlideFieldChange("cta", event.target.value)
+              }
+              disabled={!activeSlide}
             />
           </div>
 
@@ -359,9 +411,9 @@ function App() {
       </main>
 
       <footer className="statusbar">
-        <span>CyberSlide Studio v0.3.0</span>
-        <span>Strict Parser · Live Validation</span>
-        <span>{issueCount ? `${issueCount} issues require attention` : "All slides valid"}</span>
+        <span>CyberSlide Studio v0.5.0</span>
+        <span>ProjectStore connected</span>
+        <span>{isDirty ? "Unsaved project changes" : "Project saved"}</span>
       </footer>
     </div>
   );

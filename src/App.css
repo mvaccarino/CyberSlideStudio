@@ -209,3 +209,27 @@
   color: #ffb547;
   opacity: 0.85;
 }
+
+/* Sprint 1 Task 3 additions */
+.compact-control {
+  min-height: 62px;
+}
+
+.control-textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.validation-item,
+.thumbnail {
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    transform 140ms ease;
+}
+
+.validation-item:active,
+.thumbnail:active {
+  transform: translateY(1px);
+}
+

@@ -39,7 +39,7 @@ function emptySlide(number: number): ParsedSlide {
   };
 }
 
-function validateSlide(slide: ParsedSlide): ParsedSlide {
+export function validateSlide(slide: ParsedSlide): ParsedSlide {
   const issues: SlideIssue[] = [];
 
   if (!slide.title.trim()) {
@@ -88,7 +88,6 @@ export function parseCyberSlideScript(input: string): ParseResult {
 
   for (const rawLine of lines) {
     const trimmed = rawLine.trim();
-
     const slideMatch = trimmed.match(SLIDE_PATTERN);
 
     if (!parsingStarted) {
@@ -117,7 +116,6 @@ export function parseCyberSlideScript(input: string): ParseResult {
       if (inlineValue) {
         currentSlide[currentField] = inlineValue;
       }
-
       continue;
     }
 
@@ -187,4 +185,44 @@ export function parseCyberSlideScript(input: string): ParseResult {
     ignoredPreamble,
     globalIssues,
   };
+}
+
+function serializeField(label: string, value: string): string {
+  if (!value.trim()) {
+    return `${label}:\n`;
+  }
+
+  return `${label}:\n${value.trim()}`;
+}
+
+export function serializeCyberSlideScript(
+  slides: ParsedSlide[],
+  preamble: string[] = []
+): string {
+  const scriptBody = slides
+    .map((slide, index) => {
+      const number = index + 1;
+      const sections = [
+        `Slide ${number}`,
+        serializeField("Title", slide.title),
+        serializeField("Body", slide.body),
+      ];
+
+      if (slide.cta.trim()) {
+        sections.push(serializeField("CTA", slide.cta));
+      }
+
+      if (slide.notes.trim()) {
+        sections.push(serializeField("Notes", slide.notes));
+      }
+
+      return sections.join("\n\n");
+    })
+    .join("\n\n");
+
+  const cleanedPreamble = preamble.map((line) => line.trim()).filter(Boolean);
+
+  return cleanedPreamble.length
+    ? `${cleanedPreamble.join("\n")}\n\n${scriptBody}`
+    : scriptBody;
 }
