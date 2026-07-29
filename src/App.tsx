@@ -1,19 +1,44 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
+import {
+  createCreativeRecommendation,
+  type CreativeRecommendation,
+} from "./creative/CreativeRecommendation";
+import {
+  analyzeSlideMessage,
+  type MessageAnalysis,
+} from "./creative/MessageAnalyzer";
 import { parseCyberSlideScript } from "./parser/parseScript";
 import {
   deserializeProject,
   projectNameFromPath,
   serializeProject,
 } from "./services/ProjectFileService";
-import {
-  projectSlidesToScript,
-  scriptToProjectSlides,
-} from "./services/ScriptService";
+import { scriptToProjectSlides } from "./services/ScriptService";
+import { buildPosterPrompt } from "./services/PosterPromptBuilder";
+import { generatePoster, normalizePosterToFinalSize } from "./services/PosterGenerationService";
 import { useProjectStore } from "./state/useProjectStore";
 import type { ProjectMenuAction } from "./types/electron";
+import { AISettings } from "./settings/AISettings";
+import { CyberSlideVoicePanel } from "./voice/CyberSlideVoicePanel";
+import { CreativeDirectorPanel } from "./components/CreativeDirector/CreativeDirectorPanel";
+import { buildProductionPackage } from "./production/ProductionPackageBuilder";
+import { calculateQueueSummary } from "./queue/queueMetrics";
+import type { GenerationQueueItem, QueueRunStatus } from "./queue/types";
+import {
+  focalWordsFromHeadline,
+  generateHeadlineOptions,
+  type HeadlineOption,
+} from "./headlines/HeadlineGenerator";
 
-type NavItem = "Scripts" | "Slides" | "Themes" | "Export" | "Settings";
+type NavItem =
+  | "Scripts"
+  | "Slides"
+  | "Themes"
+  | "AI"
+  | "Export"
+  | "Voice"
+  | "Settings";
 
 const starterScript = `Create the next cybersecurity slideshow using our standard template.
 
@@ -56,8 +81,43 @@ function App() {
   const [activeNav, setActiveNav] = useState<NavItem>("Scripts");
   const [theme, setTheme] = useState("Enterprise Cyber");
   const [layout, setLayout] = useState("Cinematic Hero");
+  const [highlightColor, setHighlightColor] = useState("#00B7FF");
   const [currentFilePath, setCurrentFilePath] = useState<string | null>(null);
   const [fileMessage, setFileMessage] = useState("Ready");
+  const [analysisBySlide, setAnalysisBySlide] = useState<
+    Record<string, MessageAnalysis>
+  >({});
+  const [recommendationBySlide, setRecommendationBySlide] = useState<
+    Record<string, CreativeRecommendation>
+  >({});
+  const [headlineOptionsBySlide, setHeadlineOptionsBySlide] = useState<
+    Record<string, HeadlineOption[]>
+  >({});
+
+  const [backgroundBySlide, setBackgroundBySlide] = useState<
+    Record<string, { dataUrl: string; filePath: string }>
+  >({});
+
+  const [generationStatus, setGenerationStatus] = useState<
+    "idle" | "generating" | "complete" | "error"
+  >("idle");
+
+  const [generationMessage, setGenerationMessage] = useState("");
+
+  const [queueItems, setQueueItems] = useState<GenerationQueueItem[]>([]);
+  const [queueStatus, setQueueStatus] = useState<QueueRunStatus>("idle");
+  const pauseQueueRef = useRef(false);
+  const cancelQueueRef = useRef(false);
+
+  const [exportStatus, setExportStatus] = useState<
+    "idle" | "rendering" | "complete" | "error"
+  >("idle");
+
+  const [exportMessage, setExportMessage] = useState("");
+  const [productionStatus, setProductionStatus] = useState<
+    "idle" | "exporting" | "complete" | "error"
+  >("idle");
+  const [productionMessage, setProductionMessage] = useState("");
 
   const currentScript = project.script || starterScript;
   const parserResult = useMemo(
@@ -69,10 +129,33 @@ function App() {
     ? project.slides
     : scriptToProjectSlides(starterScript, project.slides).slides;
 
+  const effectiveProjectName = useMemo(() => {
+    const currentName = project.name.trim();
+    if (currentName && currentName !== "Untitled Project") return currentName;
+
+    const firstTitle = effectiveSlides
+      .map((slide) => slide.title.trim())
+      .find(Boolean);
+
+    return firstTitle || "CyberSlide Project";
+  }, [effectiveSlides, project.name]);
+
   const activeSlide =
     effectiveSlides.find((slide) => slide.id === selectedSlideId) ??
     effectiveSlides[0] ??
     selectedSlide;
+
+  const activeAnalysis = activeSlide
+    ? analysisBySlide[activeSlide.id]
+    : undefined;
+
+  const activeRecommendation = activeSlide
+    ? recommendationBySlide[activeSlide.id]
+    : undefined;
+
+  const activeHeadlineOptions = activeSlide
+    ? headlineOptionsBySlide[activeSlide.id] ?? []
+    : [];
 
   const wordCount = currentScript.trim()
     ? currentScript.trim().split(/\s+/).length
@@ -85,23 +168,37 @@ function App() {
       0,
     );
 
-  const validSlideCount = effectiveSlides.filter(
-    (slide) => slide.validation.length === 0,
-  ).length;
+  const queueSummary = useMemo(
+    () => calculateQueueSummary(queueItems),
+    [queueItems],
+  );
 
   const projectForPersistence = useMemo(
     () => ({
       ...project,
+      name: effectiveProjectName,
       script: currentScript,
       slides: effectiveSlides,
     }),
-    [project, currentScript, effectiveSlides],
+    [project, effectiveProjectName, currentScript, effectiveSlides],
   );
 
   const handleNewProject = useCallback(async () => {
     createNewProject();
     await window.cyberSlideStudio.clearCurrentProjectPath();
     setCurrentFilePath(null);
+    setAnalysisBySlide({});
+    setRecommendationBySlide({});
+    setHeadlineOptionsBySlide({});
+    setBackgroundBySlide({});
+    setGenerationStatus("idle");
+    setGenerationMessage("");
+    setQueueItems([]);
+    setQueueStatus("idle");
+    pauseQueueRef.current = false;
+    cancelQueueRef.current = false;
+    setExportStatus("idle");
+    setExportMessage("");
     setFileMessage("New project created");
   }, [createNewProject]);
 
@@ -119,6 +216,18 @@ function App() {
             : openedProject.name,
       });
       setCurrentFilePath(result.filePath);
+      setAnalysisBySlide({});
+      setRecommendationBySlide({});
+      setHeadlineOptionsBySlide({});
+      setBackgroundBySlide({});
+      setGenerationStatus("idle");
+      setGenerationMessage("");
+      setQueueItems([]);
+      setQueueStatus("idle");
+      pauseQueueRef.current = false;
+      cancelQueueRef.current = false;
+      setExportStatus("idle");
+      setExportMessage("");
       setFileMessage(`Opened ${projectNameFromPath(result.filePath)}`);
     } catch (error) {
       setFileMessage(
@@ -171,33 +280,509 @@ function App() {
     setScriptAndSlides(script, result.slides);
   };
 
-  const handleSlideFieldChange = (
-    field: "title" | "body" | "cta" | "notes",
-    value: string,
-  ) => {
+  const createRecommendationForSlide = useCallback((slide: (typeof effectiveSlides)[number]) => {
+    const hasScriptTitle = Boolean(slide.title?.trim());
+    const headlineOptions = hasScriptTitle
+      ? []
+      : generateHeadlineOptions(slide.body);
+    const selectedHeadline = hasScriptTitle
+      ? slide.title.trim()
+      : headlineOptions[0]?.text ?? "SECURITY STARTS HERE";
+
+    const analysis = analyzeSlideMessage({
+      title: selectedHeadline,
+      body: slide.body,
+      cta: slide.cta,
+    });
+    const baseRecommendation = createCreativeRecommendation(analysis);
+    const recommendation: CreativeRecommendation = {
+      ...baseRecommendation,
+      headline: selectedHeadline.toUpperCase(),
+      focalWords:
+        baseRecommendation.focalWords.length > 0
+          ? baseRecommendation.focalWords
+          : focalWordsFromHeadline(selectedHeadline),
+    };
+
+    setAnalysisBySlide((current) => ({
+      ...current,
+      [slide.id]: analysis,
+    }));
+    setRecommendationBySlide((current) => ({
+      ...current,
+      [slide.id]: recommendation,
+    }));
+    setHeadlineOptionsBySlide((current) => ({
+      ...current,
+      [slide.id]: headlineOptions,
+    }));
+
+    return { analysis, recommendation };
+  }, []);
+
+  const selectHeadlineOption = useCallback((headline: string) => {
     if (!activeSlide) return;
 
-    const updatedSlides = effectiveSlides.map((slide) =>
-      slide.id === activeSlide.id
-        ? {
-            ...slide,
-            [field]: value,
-            validation: slide.validation.filter(
-              (issue) => issue.field !== field,
-            ),
-            updatedAt: new Date().toISOString(),
-          }
-        : slide,
+    const existing = recommendationBySlide[activeSlide.id] ??
+      createRecommendationForSlide(activeSlide).recommendation;
+    const nextRecommendation: CreativeRecommendation = {
+      ...existing,
+      headline: headline.toUpperCase(),
+      focalWords: focalWordsFromHeadline(headline),
+    };
+
+    setRecommendationBySlide((current) => ({
+      ...current,
+      [activeSlide.id]: nextRecommendation,
+    }));
+    setGenerationMessage("Headline selected. Generate the slide to use it.");
+  }, [activeSlide, createRecommendationForSlide, recommendationBySlide]);
+
+  const regenerateHeadlineOptions = useCallback(() => {
+    if (!activeSlide || activeSlide.title?.trim()) return;
+    const options = generateHeadlineOptions(activeSlide.body);
+    const rotated = options.length > 1 ? [...options.slice(1), options[0]] : options;
+    setHeadlineOptionsBySlide((current) => ({
+      ...current,
+      [activeSlide.id]: rotated,
+    }));
+    if (rotated[0]) selectHeadlineOption(rotated[0].text);
+  }, [activeSlide, selectHeadlineOption]);
+
+  const runCreativeDirector = () => {
+    if (!activeSlide) return;
+
+    const { recommendation } = createRecommendationForSlide(activeSlide);
+    setLayout(
+      recommendation.layout
+        .split("-")
+        .map((word) => word[0].toUpperCase() + word.slice(1))
+        .join(" "),
     );
-
-    const preamble = parseCyberSlideScript(currentScript).ignoredPreamble;
-    const nextScript = projectSlidesToScript(updatedSlides, preamble);
-    const normalized = scriptToProjectSlides(nextScript, updatedSlides);
-
-    setScriptAndSlides(nextScript, normalized.slides);
   };
 
-  const previewTitle = activeSlide?.title.trim().toUpperCase() ?? "";
+  const previewTitle =
+    activeRecommendation?.headline ??
+    activeAnalysis?.primaryMessage ??
+    activeSlide?.title.trim().toUpperCase() ??
+    "";
+
+  const previewBody =
+    activeRecommendation?.supportingText ??
+    activeAnalysis?.supportingMessage ??
+    activeSlide?.body ??
+    "";
+
+  const previewFocalWords =
+    activeRecommendation?.focalWords ??
+    activeAnalysis?.focalWords ??
+    [];
+
+  const generateSlidePoster = useCallback(
+    async (
+      slide: (typeof effectiveSlides)[number],
+      quality: "low" | "medium" | "high" = "low",
+    ) => {
+      const existingRecommendation = recommendationBySlide[slide.id];
+      const recommendation =
+        existingRecommendation ?? createRecommendationForSlide(slide).recommendation;
+      const slideLayout = recommendation.layout
+        .split("-")
+        .map((word) => word[0].toUpperCase() + word.slice(1))
+        .join(" ");
+
+      const posterPrompt = buildPosterPrompt({
+        headline: recommendation.headline,
+        supportingText: recommendation.supportingText,
+        cta: slide.cta,
+        theme,
+        layout: slideLayout,
+        focalWords: recommendation.focalWords,
+        highlightColor,
+      });
+
+      const result = await generatePoster({
+        prompt: posterPrompt,
+        slideNumber: slide.number,
+        projectName: effectiveProjectName,
+        quality,
+      });
+
+      setBackgroundBySlide((current) => ({
+        ...current,
+        [slide.id]: {
+          dataUrl: result.dataUrl,
+          filePath: result.filePath,
+        },
+      }));
+
+      return result;
+    },
+    [
+      createRecommendationForSlide,
+      effectiveProjectName,
+      highlightColor,
+      recommendationBySlide,
+      theme,
+    ],
+  );
+
+  const generateActiveBackground = async () => {
+    if (!activeSlide || queueStatus === "running" || queueStatus === "paused") return;
+
+    try {
+      setGenerationStatus("generating");
+      setGenerationMessage("Generating draft poster for the current slide…");
+      await generateSlidePoster(activeSlide, "low");
+      setGenerationStatus("complete");
+      setGenerationMessage("Draft poster complete. Final export will use High quality.");
+    } catch (error) {
+      setGenerationStatus("error");
+      setGenerationMessage(
+        error instanceof Error ? error.message : "Image generation failed.",
+      );
+    }
+  };
+
+  const waitWhilePaused = useCallback(async () => {
+    while (pauseQueueRef.current && !cancelQueueRef.current) {
+      await new Promise((resolve) => window.setTimeout(resolve, 250));
+    }
+  }, []);
+
+  const runQueue = useCallback(
+    async (slideIds: string[]) => {
+      const slidesToGenerate = effectiveSlides.filter((slide) =>
+        slideIds.includes(slide.id),
+      );
+
+      if (!slidesToGenerate.length) return;
+
+      cancelQueueRef.current = false;
+      pauseQueueRef.current = false;
+      setQueueStatus("running");
+      setGenerationStatus("generating");
+      setGenerationMessage(`Preparing ${slidesToGenerate.length} draft poster${slidesToGenerate.length === 1 ? "" : "s"}…`);
+      setQueueItems(
+        slidesToGenerate.map((slide) => ({
+          slideId: slide.id,
+          slideNumber: slide.number,
+          title: recommendationBySlide[slide.id]?.headline || slide.title || `Slide ${slide.number}`,
+          status: "waiting",
+        })),
+      );
+
+      for (const slide of slidesToGenerate) {
+        await waitWhilePaused();
+
+        if (cancelQueueRef.current) {
+          setQueueItems((current) =>
+            current.map((item) =>
+              item.status === "waiting"
+                ? { ...item, status: "cancelled" }
+                : item,
+            ),
+          );
+          setQueueStatus("cancelled");
+          setGenerationStatus("idle");
+          setGenerationMessage("Queue cancelled after the active request finished.");
+          return;
+        }
+
+        const startedAt = Date.now();
+        setQueueItems((current) =>
+          current.map((item) =>
+            item.slideId === slide.id
+              ? { ...item, status: "generating", startedAt, error: undefined }
+              : item,
+          ),
+        );
+        setGenerationMessage(`Generating draft poster for slide ${slide.number} of ${slidesToGenerate.length}…`);
+
+        try {
+          await generateSlidePoster(slide, "low");
+          const completedAt = Date.now();
+          setQueueItems((current) =>
+            current.map((item) =>
+              item.slideId === slide.id
+                ? {
+                    ...item,
+                    status: "complete",
+                    completedAt,
+                    durationMs: completedAt - startedAt,
+                  }
+                : item,
+            ),
+          );
+        } catch (error) {
+          const completedAt = Date.now();
+          setQueueItems((current) =>
+            current.map((item) =>
+              item.slideId === slide.id
+                ? {
+                    ...item,
+                    status: "failed",
+                    completedAt,
+                    durationMs: completedAt - startedAt,
+                    error:
+                      error instanceof Error
+                        ? error.message
+                        : "Poster generation failed.",
+                  }
+                : item,
+            ),
+          );
+        }
+      }
+
+      setQueueStatus("complete");
+      setGenerationStatus("complete");
+      setGenerationMessage("Draft queue complete. Review each slide before final export.");
+    },
+    [
+      effectiveSlides,
+      generateSlidePoster,
+      recommendationBySlide,
+      waitWhilePaused,
+    ],
+  );
+
+  const generateAllSlides = async () => {
+    if (queueStatus === "running" || queueStatus === "paused") return;
+    await runQueue(effectiveSlides.map((slide) => slide.id));
+  };
+
+  const retryFailedSlides = async () => {
+    const failedIds = queueItems
+      .filter((item) => item.status === "failed")
+      .map((item) => item.slideId);
+    await runQueue(failedIds);
+  };
+
+  const pauseQueue = () => {
+    if (queueStatus !== "running") return;
+    pauseQueueRef.current = true;
+    setQueueStatus("paused");
+    setGenerationMessage("Queue paused. The active API request will finish first.");
+  };
+
+  const resumeQueue = () => {
+    if (queueStatus !== "paused") return;
+    pauseQueueRef.current = false;
+    setQueueStatus("running");
+    setGenerationMessage("Queue resumed…");
+  };
+
+  const cancelQueue = () => {
+    if (queueStatus !== "running" && queueStatus !== "paused") return;
+    cancelQueueRef.current = true;
+    pauseQueueRef.current = false;
+    setQueueStatus("cancelling");
+    setGenerationMessage("Cancelling after the active API request finishes…");
+  };
+
+  const exportActiveFinalSlide = async () => {
+    if (!effectiveSlides.length) {
+      setExportStatus("error");
+      setExportMessage("No slides are available to finalize.");
+      return;
+    }
+
+    cancelQueueRef.current = false;
+    pauseQueueRef.current = false;
+
+    setExportStatus("rendering");
+    setExportMessage(
+      `Preparing ${effectiveSlides.length} High-quality final poster${
+        effectiveSlides.length === 1 ? "" : "s"
+      }…`,
+    );
+    setQueueStatus("running");
+    setQueueItems(
+      effectiveSlides.map((slide) => ({
+        slideId: slide.id,
+        slideNumber: slide.number,
+        title:
+          recommendationBySlide[slide.id]?.headline ||
+          slide.title ||
+          `Slide ${slide.number}`,
+        status: "waiting",
+      })),
+    );
+
+    let completedCount = 0;
+    const failures: string[] = [];
+
+    for (const slide of effectiveSlides) {
+      await waitWhilePaused();
+
+      if (cancelQueueRef.current) {
+        setQueueItems((current) =>
+          current.map((item) =>
+            item.status === "waiting"
+              ? { ...item, status: "cancelled" }
+              : item,
+          ),
+        );
+        setQueueStatus("cancelled");
+        setExportStatus("idle");
+        setExportMessage(
+          "Final export cancelled after the active request finished.",
+        );
+        return;
+      }
+
+      const startedAt = Date.now();
+
+      setQueueItems((current) =>
+        current.map((item) =>
+          item.slideId === slide.id
+            ? {
+                ...item,
+                status: "generating",
+                startedAt,
+                completedAt: undefined,
+                durationMs: undefined,
+                error: undefined,
+              }
+            : item,
+        ),
+      );
+
+      setExportMessage(
+        `Generating High-quality final poster ${slide.number} of ${effectiveSlides.length}…`,
+      );
+
+      try {
+        const finalPoster = await generateSlidePoster(slide, "high");
+        const dataUrl = await normalizePosterToFinalSize(finalPoster.dataUrl);
+        const result = await window.cyberSlideStudio.saveFinalSlide({
+          dataUrl,
+          slideNumber: slide.number,
+          projectName: effectiveProjectName,
+        });
+
+        completedCount += 1;
+        const completedAt = Date.now();
+
+        setBackgroundBySlide((current) => ({
+          ...current,
+          [slide.id]: {
+            dataUrl,
+            filePath: result.filePath,
+          },
+        }));
+
+        setQueueItems((current) =>
+          current.map((item) =>
+            item.slideId === slide.id
+              ? {
+                  ...item,
+                  status: "complete",
+                  completedAt,
+                  durationMs: completedAt - startedAt,
+                }
+              : item,
+          ),
+        );
+      } catch (error) {
+        const completedAt = Date.now();
+        const message =
+          error instanceof Error
+            ? error.message
+            : "High-quality final generation failed.";
+
+        failures.push(`Slide ${slide.number}: ${message}`);
+
+        setQueueItems((current) =>
+          current.map((item) =>
+            item.slideId === slide.id
+              ? {
+                  ...item,
+                  status: "failed",
+                  completedAt,
+                  durationMs: completedAt - startedAt,
+                  error: message,
+                }
+              : item,
+          ),
+        );
+      }
+    }
+
+    setQueueStatus("complete");
+
+    if (failures.length > 0) {
+      setExportStatus("error");
+      setExportMessage(
+        `${completedCount} of ${effectiveSlides.length} final posters completed. ${failures.length} failed. Use Retry Failed Slides to try them again.`,
+      );
+      return;
+    }
+
+    setExportStatus("complete");
+    setExportMessage(
+      `All ${completedCount} slides were finalized and saved in High quality.`,
+    );
+  };
+
+  const exportProductionPackage = async () => {
+    if (!currentFilePath) {
+      setProductionStatus("error");
+      setProductionMessage("Save the .cslide project before exporting the production package.");
+      return;
+    }
+
+    try {
+      setProductionStatus("exporting");
+      setProductionMessage(
+        "Building CapCut, voiceover, music, social, and project-summary files…",
+      );
+
+      await new Promise<void>((resolve) => {
+        window.requestAnimationFrame(() => resolve());
+      });
+
+      const slides = effectiveSlides.map((slide) => {
+        const recommendation =
+          recommendationBySlide[slide.id] ??
+          createRecommendationForSlide(slide).recommendation;
+        return {
+          number: slide.number,
+          headline: recommendation.headline,
+          body: recommendation.supportingText || slide.body,
+          cta: slide.cta,
+          imageDataUrl: backgroundBySlide[slide.id]?.dataUrl,
+        };
+      });
+
+      const payload = buildProductionPackage({
+        projectName: effectiveProjectName,
+        theme,
+        layout,
+        slides,
+      });
+
+      const result = await window.cyberSlideStudio.exportProductionPackage(payload);
+      if (!result) {
+        setProductionStatus("idle");
+        setProductionMessage("");
+        return;
+      }
+
+      setProductionStatus("complete");
+      setProductionMessage(`Production package exported: ${result.folderPath}`);
+    } catch (error) {
+      setProductionStatus("error");
+      setProductionMessage(
+        error instanceof Error ? error.message : "Production package export failed.",
+      );
+    }
+  };
+
+  const activeBackground = activeSlide
+    ? backgroundBySlide[activeSlide.id]
+    : undefined;
 
   return (
     <div className="app-shell">
@@ -211,25 +796,25 @@ function App() {
           <div>
             <div className="brand-title">CyberSlide Studio</div>
             <div className="brand-subtitle">
-              {project.name} {isDirty ? "• Unsaved" : "• Saved"}
+              {effectiveProjectName} {isDirty ? "• Unsaved" : "• Saved"}
             </div>
           </div>
         </div>
 
-        <nav className="main-nav" aria-label="Primary navigation">
-          {(["Scripts", "Slides", "Themes", "Export", "Settings"] as NavItem[]).map(
-            (item) => (
-              <button
-                key={item}
-                type="button"
-                className={activeNav === item ? "nav-button active" : "nav-button"}
-                onClick={() => setActiveNav(item)}
-              >
-                {item}
-              </button>
-            ),
-          )}
-        </nav>
+    <nav className="main-nav" aria-label="Primary navigation">
+  {(
+    ["Scripts", "Slides", "Themes", "AI", "Voice", "Export", "Settings"] as NavItem[]
+  ).map((item) => (
+    <button
+      key={item}
+      type="button"
+      className={activeNav === item ? "nav-button active" : "nav-button"}
+      onClick={() => setActiveNav(item)}
+    >
+      {item}
+    </button>
+  ))}
+</nav>
 
         <div className="topbar-actions">
           <button className="ghost-button" type="button" onClick={handleOpenProject}>
@@ -249,9 +834,6 @@ function App() {
           <span className="status-text">
             {effectiveSlides.length} slides · {issueCount} issues
           </span>
-          <button className="primary-button" type="button">
-            Generate Slides
-          </button>
         </div>
       </header>
 
@@ -287,14 +869,14 @@ function App() {
 
           <div className="editor-footer">
             <span>{currentScript.length} characters</span>
-            <span className="live-parser-badge">.CSLIDE</span>
+            <span className="live-parser-badge">DIRECTOR</span>
           </div>
         </aside>
 
         <section className="preview-column">
           <div className="preview-toolbar">
             <div>
-              <p className="eyebrow">LIVE PREVIEW</p>
+              <p className="eyebrow">CREATIVE RECOMMENDATION PREVIEW</p>
               <h2>
                 Slide {activeSlide?.number ?? 1} of{" "}
                 {Math.max(effectiveSlides.length, 1)}
@@ -309,40 +891,74 @@ function App() {
           </div>
 
           <div className="preview-stage">
-            <div className="slide-frame">
-              <div className="slide-grid" />
-              <div className="slide-orb orb-one" />
-              <div className="slide-orb orb-two" />
-              <div className="scan-line" />
+            <div
+              className="slide-frame"
+              style={
+                activeBackground
+                  ? {
+                      backgroundImage: `linear-gradient(
+                        rgba(2,8,14,.25),
+                        rgba(2,8,14,.75)
+                      ), url("${activeBackground.dataUrl}")`,
+                      backgroundRepeat: "no-repeat",
+                      backgroundSize: "cover",
+                      backgroundPosition: "center center",
+                      color:
+                        activeRecommendation?.palette.foreground ?? "#F1FBFF",
+                    }
+                  : activeRecommendation
+                    ? {
+                        backgroundColor:
+                          activeRecommendation.palette.background,
+                        color: activeRecommendation.palette.foreground,
+                      }
+                    : undefined
+              }
+            >
+              {!activeBackground && (
+                <>
+                                <div className="slide-grid" />
+                                <div className="slide-orb orb-one" />
+                                <div className="slide-orb orb-two" />
+                                <div className="scan-line" />
 
-              <div className="slide-content">
-                <div className="slide-kicker">
-                  <span className="kicker-dot" />
-                  CYBERSECURITY AWARENESS
-                </div>
+                                <div className="slide-content">
 
-                <h3 className={!previewTitle ? "missing-content" : ""}>
-                  {(previewTitle || "MISSING TITLE")
-                    .split(/\s+/)
-                    .map((word, index) => (
-                      <span key={`${word}-${index}`}>{word}</span>
-                    ))}
-                </h3>
+                                  <h3 className={!previewTitle ? "missing-content" : ""}>
+                                    {(previewTitle || "MISSING TITLE")
+                                      .split(/\s+/)
+                                      .map((word, index) => (
+                                        <span
+                                          key={`${word}-${index}`}
+                                          className={
+                                            previewFocalWords.includes(
+                                              word.replace(/[^\w]/g, "").toUpperCase(),
+                                            )
+                                              ? "focal-word"
+                                              : ""
+                                          }
+                                        >
+                                          {word}
+                                        </span>
+                                      ))}
+                                  </h3>
 
-                <p className={!activeSlide?.body ? "missing-content" : ""}>
-                  {activeSlide?.body || "Missing Body"}
-                </p>
+                                  <p className={`slide-body-card ${!previewBody ? "missing-content" : ""}`}>
+                                    {previewBody || "Missing Body"}
+                                  </p>
 
-                {activeSlide?.cta && (
-                  <div className="slide-cta">{activeSlide.cta}</div>
-                )}
+                                  {activeSlide?.cta && (
+                                    <div className="slide-cta">{activeSlide.cta}</div>
+                                  )}
 
-                <div className="slide-accent-line" />
-              </div>
+                                  <div className="slide-accent-line" />
+                                </div>
 
-              <div className="caption-safe-zone">
-                <span>20% CAPTION-SAFE ZONE</span>
-              </div>
+                                <div className="caption-safe-zone">
+                                  <span>20% CAPTION-SAFE ZONE</span>
+                                </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -366,7 +982,9 @@ function App() {
                   {String(slide.number).padStart(2, "0")}
                 </span>
                 <span className="thumbnail-title">
-                  {slide.title || "⚠ Missing Title"}
+                  {recommendationBySlide[slide.id]?.headline ??
+                    slide.title ??
+                    "⚠ Missing Title"}
                 </span>
               </button>
             ))}
@@ -374,143 +992,56 @@ function App() {
         </section>
 
         <aside className="right-panel panel validation-panel">
-          <div className="panel-heading compact">
-            <div>
-              <p className="eyebrow">PROJECT VALIDATION</p>
-              <h2>Slide Inspector</h2>
-            </div>
-            <span
-              className={
-                issueCount
-                  ? "validation-summary warning"
-                  : "validation-summary"
-              }
-            >
-              {validSlideCount}/{effectiveSlides.length || 0} valid
-            </span>
-          </div>
-
-          <div className="validation-list">
-            {effectiveSlides.map((slide) => (
-              <button
-                key={slide.id}
-                type="button"
-                className={
-                  activeSlide?.id === slide.id
-                    ? "validation-item selected"
-                    : "validation-item"
-                }
-                onClick={() => selectSlide(slide.id)}
-              >
-                <div
-                  className={
-                    slide.validation.length
-                      ? "validation-icon warn"
-                      : "validation-icon ok"
-                  }
-                >
-                  {slide.validation.length ? "!" : "✓"}
-                </div>
-                <div className="validation-copy">
-                  <strong>
-                    Slide {slide.number}: {slide.title || "Untitled"}
-                  </strong>
-                  {slide.validation.length ? (
-                    slide.validation.map((issue) => (
-                      <span key={issue.id}>{issue.message}</span>
-                    ))
-                  ) : (
-                    <span>Ready for rendering</span>
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-
-          <div className="inspector-divider" />
-
-          <div className="inspector-section">
-            <label htmlFor="slide-title">Headline</label>
-            <textarea
-              id="slide-title"
-              className={`control-textarea title-control ${
-                !activeSlide?.title ? "invalid-control" : ""
-              }`}
-              value={activeSlide?.title ?? ""}
-              placeholder="Missing Title"
-              onChange={(event) =>
-                handleSlideFieldChange("title", event.target.value)
-              }
-              disabled={!activeSlide}
+          {activeNav === "AI" ? (
+            <AISettings />
+          ) : activeNav === "Voice" ? (
+            <CyberSlideVoicePanel projectName={effectiveProjectName} slides={effectiveSlides} />
+          ) : (
+            <CreativeDirectorPanel
+              activeSlideExists={Boolean(activeSlide)}
+              activeRecommendation={activeRecommendation}
+              headlineOptions={activeHeadlineOptions}
+              scriptTitleIsBlank={!activeSlide?.title?.trim()}
+              onSelectHeadline={selectHeadlineOption}
+              onRegenerateHeadlines={regenerateHeadlineOptions}
+              generationStatus={generationStatus}
+              generationMessage={generationMessage}
+              onCreateRecommendation={runCreativeDirector}
+              onGenerateBackground={generateActiveBackground}
+              onGenerateAllSlides={generateAllSlides}
+              onRetryFailedSlides={retryFailedSlides}
+              onPauseQueue={pauseQueue}
+              onResumeQueue={resumeQueue}
+              onCancelQueue={cancelQueue}
+              queueItems={queueItems}
+              queueStatus={queueStatus}
+              queueSummary={queueSummary}
+              backgroundReady={Boolean(activeBackground)}
+              exportStatus={exportStatus}
+              exportMessage={exportMessage}
+              onExportFinalSlide={exportActiveFinalSlide}
+              onExportProductionPackage={exportProductionPackage}
+              productionStatus={productionStatus}
+              productionMessage={productionMessage}
+              theme={theme}
+              layout={layout}
+              setTheme={setTheme}
+              setLayout={setLayout}
+              highlightColor={highlightColor}
+              setHighlightColor={setHighlightColor}
             />
-          </div>
-
-          <div className="inspector-section">
-            <label htmlFor="slide-body">Supporting text</label>
-            <textarea
-              id="slide-body"
-              className={`control-textarea ${
-                !activeSlide?.body ? "invalid-control" : ""
-              }`}
-              value={activeSlide?.body ?? ""}
-              placeholder="Missing Body"
-              onChange={(event) =>
-                handleSlideFieldChange("body", event.target.value)
-              }
-              disabled={!activeSlide}
-            />
-          </div>
-
-          <div className="inspector-section">
-            <label htmlFor="slide-cta">CTA</label>
-            <textarea
-              id="slide-cta"
-              className="control-textarea compact-control"
-              value={activeSlide?.cta ?? ""}
-              placeholder="Optional CTA"
-              onChange={(event) =>
-                handleSlideFieldChange("cta", event.target.value)
-              }
-              disabled={!activeSlide}
-            />
-          </div>
-
-          <div className="inspector-grid">
-            <div className="inspector-section">
-              <label htmlFor="theme-select">Theme</label>
-              <select
-                id="theme-select"
-                value={theme}
-                onChange={(event) => setTheme(event.target.value)}
-              >
-                <option>Enterprise Cyber</option>
-                <option>Minimal Dark</option>
-                <option>Security Operations</option>
-                <option>Modern Technology</option>
-              </select>
-            </div>
-
-            <div className="inspector-section">
-              <label htmlFor="layout-select">Layout</label>
-              <select
-                id="layout-select"
-                value={layout}
-                onChange={(event) => setLayout(event.target.value)}
-              >
-                <option>Cinematic Hero</option>
-                <option>Split Statement</option>
-                <option>Bold Warning</option>
-                <option>Minimal CTA</option>
-              </select>
-            </div>
-          </div>
+          )}
         </aside>
       </main>
 
       <footer className="statusbar">
-        <span>CyberSlide Studio v0.6.0</span>
+        <span>CyberSlide Studio v3.0.0 Alpha 3</span>
         <span>{fileMessage}</span>
-        <span>{isDirty ? "Unsaved project changes" : "Project saved"}</span>
+        <span>
+          {activeRecommendation
+            ? `Creative recommendation ready · ${activeRecommendation.palette.name}`
+            : "Creative Director ready"}
+        </span>
       </footer>
     </div>
   );
