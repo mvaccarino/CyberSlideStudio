@@ -22,3 +22,33 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local dependencies and builds
+node_modules/
+dist/
+build/
+coverage/
+.cache/
+
+# Backups and temporary packages
+Backups/
+src.zip
+patches/
+*.patch.txt
+*-SNIPPET.txt
+*.log
+*.tmp
+*.temp
+
+# Generated test assets
+src/slide-*-final.png
+
+# Local binaries and downloaded models
+resources/ffmpeg/*.exe
+resources/models/
+resources/cache/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
