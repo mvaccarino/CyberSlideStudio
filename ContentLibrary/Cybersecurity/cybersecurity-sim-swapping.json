@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-sim-swapping",
+  "title": "SIM Swapping",
+  "category": "Cybersecurity",
+  "description": "A warning short-form SIM Swapping explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 37,
+  "productionStyle": "Cybersecurity Professional",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "direct and calm",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "IF YOUR PHONE SUDDENLY LOSES SERVICE, YOUR NUMBER MAY BE UNDER ATTACK",
+  "youtubeTitle": "If your phone suddenly loses service, your number may be under attack | SIM Swapping Explained",
+  "youtubeDescription": "A plain-language SIM Swapping example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "If your phone suddenly loses service, your number may be under attack. Here is the safer move.",
+  "instagramCaption": "SIM Swapping makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#simswapping",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a worried phone owner in a mobile carrier store holding a phone with no signal; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "If your phone suddenly loses service, your number may be under attack.",
+  "voiceScript": "If your phone suddenly loses service, your number may be under attack. SIM Swapping means a criminal convinces a mobile carrier to move your number to a SIM card or device they control. Picture this: your phone suddenly loses service while password-reset codes reach somebody else. Here is why that matters: the criminal may reset email, banking, or social accounts. Call your carrier from another phone if service disappears unexpectedly. Add a carrier PIN and prefer an authenticator app over text codes. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "Your Number Can Be Stolen",
+      "body": "A criminal can trick your carrier into moving your number, then receive password-reset codes meant for you.",
+      "cta": ""
+    },
+    {
+      "title": "SIM Swapping, In Plain English",
+      "body": "SIM Swapping means a criminal convinces a mobile carrier to move your number to a SIM card or device they control.",
+      "cta": ""
+    },
+    {
+      "title": "A Real SIM Swapping Moment",
+      "body": "your phone suddenly loses service while password-reset codes reach somebody else",
+      "cta": ""
+    },
+    {
+      "title": "The SIM Swapping Consequence",
+      "body": "the criminal may reset email, banking, or social accounts",
+      "cta": ""
+    },
+    {
+      "title": "Use SIM Swapping More Safely",
+      "body": "Call your carrier from another phone if service disappears unexpectedly.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About SIM Swapping",
+      "body": "Add a carrier PIN and prefer an authenticator app over text codes.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "sim-swapping",
+    "cybersecurity",
+    "what-could-happen",
+    "warning"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-05-13T00:00:00.000Z",
+  "modified": "2026-05-13T00:00:00.000Z"
+}

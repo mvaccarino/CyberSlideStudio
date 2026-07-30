@@ -1,6 +1,8 @@
 const { ipcMain, shell } = require("electron");
 const path = require("node:path");
 const fs = require("node:fs/promises");
+const { spawn } = require("node:child_process");
+const { resolveFfmpeg } = require("../video/ffmpegResolver.cjs");
 const {
   getStatus,
   listVoices,
@@ -8,6 +10,29 @@ const {
   synthesizeWav,
 } = require("./cyberSlideVoicePro.cjs");
 
+
+function run(executable, args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(executable, args, { windowsHide: true, shell: false });
+    let stderr = "";
+    child.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
+    child.once("error", reject);
+    child.once("close", (code) => code === 0 ? resolve() : reject(new Error(`FFmpeg narration assembly failed (${code}). ${stderr.slice(-1200)}`)));
+  });
+}
+
+async function buildFullNarration(scenes, outputPath) {
+  const ffmpeg = await resolveFfmpeg();
+  const args = ["-y"];
+  scenes.forEach((scene) => args.push("-i", scene.audioPath));
+  const filters = scenes.map((scene, index) => {
+    const delay = Math.round(scene.paddingBeforeSeconds * 1000);
+    return `[${index}:a]adelay=${delay}|${delay},apad,atrim=0:${scene.sceneDurationSeconds.toFixed(3)}[a${index}]`;
+  });
+  filters.push(`${scenes.map((_scene, index) => `[a${index}]`).join("")}concat=n=${scenes.length}:v=0:a=1[out]`);
+  args.push("-filter_complex", filters.join(";"), "-map", "[out]", "-ar", "48000", "-ac", "2", outputPath);
+  await run(ffmpeg.path, args);
+}
 function narrationForSlide(slide) {
   return [slide?.title, slide?.body, slide?.cta]
     .map((value) => String(value || "").trim())
@@ -27,13 +52,13 @@ function registerCyberSlideVoiceHandlers({ ensureWorkspace, getMainWindow }) {
   ipcMain.handle("voice:list", async () => listVoices());
 
   ipcMain.handle("voice:prepare", async () => {
-    sendProgress({ phase: "model", percent: 0, message: "Preparing CyberSlide Voice Pro…" });
+    sendProgress({ phase: "model", percent: 0, message: "Preparing CyberSlide Voice Proâ€¦" });
     await loadModel((progress) => {
       const percent = Number(progress?.progress || 0);
       sendProgress({
         phase: "model",
         percent: Number.isFinite(percent) ? Math.round(percent) : 0,
-        message: progress?.file ? `Downloading ${progress.file}…` : "Loading the local neural voice model…",
+        message: progress?.file ? `Downloading ${progress.file}â€¦` : "Loading the local neural voice modelâ€¦",
       });
     });
     sendProgress({ phase: "ready", percent: 100, message: "CyberSlide Voice Pro is ready." });
@@ -46,7 +71,7 @@ function registerCyberSlideVoiceHandlers({ ensureWorkspace, getMainWindow }) {
     if (!payload?.voiceId) throw new Error("Select a CyberSlide Voice Pro voice.");
 
     const workspace = await ensureWorkspace(payload?.projectName);
-    const voiceRoot = path.join(workspace.root, "Voiceover");
+    const voiceRoot = workspace.voiceover;
     const sceneRoot = path.join(voiceRoot, "Scene-Audio");
     await fs.mkdir(sceneRoot, { recursive: true });
 
@@ -67,7 +92,7 @@ function registerCyberSlideVoiceHandlers({ ensureWorkspace, getMainWindow }) {
         percent: Math.round((index / slides.length) * 100),
         currentScene: index + 1,
         totalScenes: slides.length,
-        message: `Generating professional narration for slide ${slideNumber}…`,
+        message: `Generating professional narration for slide ${slideNumber}â€¦`,
       });
 
       const result = await synthesizeWav({
@@ -79,7 +104,7 @@ function registerCyberSlideVoiceHandlers({ ensureWorkspace, getMainWindow }) {
           sendProgress({
             phase: "model",
             percent: Math.round(Number(progress?.progress || 0)),
-            message: "Downloading the local neural voice model for first use…",
+            message: "Downloading the local neural voice model for first useâ€¦",
           });
         },
       });
@@ -113,9 +138,11 @@ function registerCyberSlideVoiceHandlers({ ensureWorkspace, getMainWindow }) {
       scenes: timing,
     };
     await fs.writeFile(timingPath, JSON.stringify(manifest, null, 2), "utf8");
+    const narrationPath = path.join(voiceRoot, "Full-Narration.wav");
+    await buildFullNarration(timing, narrationPath);
 
     sendProgress({ phase: "complete", percent: 100, message: "Professional narration complete." });
-    return { folderPath: voiceRoot, timingPath, totalDurationSeconds: cursor, scenes: timing };
+    return { folderPath: voiceRoot, timingPath, narrationPath, totalDurationSeconds: cursor, generatedAt: manifest.generatedAt, scenes: timing };
   });
 
   ipcMain.handle("voice:preview", async (_event, payload) => {
@@ -129,7 +156,7 @@ function registerCyberSlideVoiceHandlers({ ensureWorkspace, getMainWindow }) {
       onProgress: (progress) => sendProgress({
         phase: "model",
         percent: Math.round(Number(progress?.progress || 0)),
-        message: "Downloading the local neural voice model for first use…",
+        message: "Downloading the local neural voice model for first useâ€¦",
       }),
     });
     await shell.openPath(result.outputPath);
@@ -138,7 +165,7 @@ function registerCyberSlideVoiceHandlers({ ensureWorkspace, getMainWindow }) {
 
   ipcMain.handle("voice:open-folder", async (_event, projectName) => {
     const workspace = await ensureWorkspace(projectName);
-    const folderPath = path.join(workspace.root, "Voiceover");
+    const folderPath = workspace.voiceover;
     await fs.mkdir(folderPath, { recursive: true });
     await shell.openPath(folderPath);
     return folderPath;

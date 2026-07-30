@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-deepfake-voices",
+  "title": "Deepfake Voices",
+  "category": "Cybersecurity",
+  "description": "A practical how-to short-form Deepfake Voices explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 38,
+  "productionStyle": "Fast Social",
+  "cameraStyle": "fast focus-led pushes",
+  "captionStyle": "bold kinetic captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "THE NEXT EMERGENCY CALL FROM SOMEONE YOU LOVE MIGHT NOT BE THEIR REAL VOICE",
+  "youtubeTitle": "The next emergency call from someone you love might not be their real voice | Deepfake Voices Explained",
+  "youtubeDescription": "A plain-language Deepfake Voices example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "The next emergency call from someone you love might not be their real voice. Here is the safer move.",
+  "instagramCaption": "Deepfake Voices makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#deepfakevoices",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a parent in a living room holding a phone during an alarming call while reaching for a trusted contact; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "The next emergency call from someone you love might not be their real voice.",
+  "voiceScript": "The next emergency call from someone you love might not be their real voice. Deepfake Voices means synthetic speech made to sound like a real person, sometimes built from short public audio clips. Picture this: a parent hears a call that sounds like their child urgently asking for money. Here is why that matters: familiar sound is no longer proof of identity when a caller creates panic. Hang up and call the person on a trusted number. Use a private family verification phrase. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "That Voice May Be Fake",
+      "body": "Scammers can clone a familiar voice from public audio and use it to create a convincing emergency.",
+      "cta": ""
+    },
+    {
+      "title": "Deepfake Voices, In Plain English",
+      "body": "Deepfake Voices means synthetic speech made to sound like a real person, sometimes built from short public audio clips.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Deepfake Voices Moment",
+      "body": "a parent hears a call that sounds like their child urgently asking for money",
+      "cta": ""
+    },
+    {
+      "title": "The Deepfake Voices Consequence",
+      "body": "familiar sound is no longer proof of identity when a caller creates panic",
+      "cta": ""
+    },
+    {
+      "title": "Use Deepfake Voices More Safely",
+      "body": "Hang up and call the person on a trusted number.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Deepfake Voices",
+      "body": "Use a private family verification phrase.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "deepfake-voices",
+    "cybersecurity",
+    "warning-signs",
+    "practical-how-to"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-04-18T00:00:00.000Z",
+  "modified": "2026-04-18T00:00:00.000Z"
+}

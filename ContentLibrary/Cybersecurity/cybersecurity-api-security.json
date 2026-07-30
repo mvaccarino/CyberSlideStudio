@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-api-security",
+  "title": "API Security",
+  "category": "Cybersecurity",
+  "description": "A myth vs reality short-form API Security explanation for it professionals, using a realistic example and specific next steps.",
+  "difficulty": "Intermediate",
+  "audience": "IT Professionals",
+  "estimatedSeconds": 44,
+  "productionStyle": "Viral Short",
+  "cameraStyle": "fast focus-led pushes",
+  "captionStyle": "bold kinetic captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "MYTH: API SECURITY ONLY MATTERS TO TECHNICAL PEOPLE",
+  "youtubeTitle": "Myth: api security only matters to technical people | API Security Explained",
+  "youtubeDescription": "A plain-language API Security example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "Myth: api security only matters to technical people. Here is the safer move.",
+  "instagramCaption": "API Security makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#apisecurity",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with api security in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "Myth: api security only matters to technical people.",
+  "voiceScript": "Myth: api security only matters to technical people. API Security means the real-world choices, risks, and protections involved in api security. Picture this: a phone owner encounters api security during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed api security choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific api security setting before continuing. Use the available api security protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "The Truth About API Security",
+      "body": "A rushed api security choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "API Security, In Plain English",
+      "body": "API Security means the real-world choices, risks, and protections involved in api security.",
+      "cta": ""
+    },
+    {
+      "title": "A Real API Security Moment",
+      "body": "a phone owner encounters api security during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The API Security Consequence",
+      "body": "a rushed api security choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use API Security More Safely",
+      "body": "Check the source and the specific api security setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About API Security",
+      "body": "Use the available api security protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "api-security",
+    "cybersecurity",
+    "myth-vs-reality",
+    "myth-vs-reality"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-05-10T00:00:00.000Z",
+  "modified": "2026-05-10T00:00:00.000Z"
+}

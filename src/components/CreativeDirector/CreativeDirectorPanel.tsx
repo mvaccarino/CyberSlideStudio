@@ -23,6 +23,10 @@ type CreativeDirectorPanelProps = {
   generationMessage: string;
   onCreateRecommendation: () => void;
   onGenerateBackground: () => Promise<void>;
+  onApproveImage: () => Promise<void>;
+  onRegenerateImage: () => Promise<void>;
+  onEditPrompt: () => void;
+  imageApproved: boolean;
   onGenerateAllSlides: () => Promise<void>;
   onRetryFailedSlides: () => Promise<void>;
   onPauseQueue: () => void;
@@ -57,6 +61,10 @@ export function CreativeDirectorPanel({
   generationMessage,
   onCreateRecommendation,
   onGenerateBackground,
+  onApproveImage,
+  onRegenerateImage,
+  onEditPrompt,
+  imageApproved,
   onGenerateAllSlides,
   onRetryFailedSlides,
   onPauseQueue,
@@ -110,16 +118,20 @@ export function CreativeDirectorPanel({
           onClick={() => void onGenerateBackground()}
           disabled={!activeSlideExists || queueActive || generationStatus === "generating"}
         >
-          Generate Current Slide — Draft
+          Generate Current Slide — Working
         </button>
 
-        <button
-          className="secondary-button full-width"
-          type="button"
-          onClick={() => void onGenerateAllSlides()}
+        <div className="inspector-grid">
+          <button className="secondary-button" type="button" onClick={() => void onApproveImage()} disabled={!backgroundReady || imageApproved}>Approve</button>
+          <button className="secondary-button" type="button" onClick={() => void onRegenerateImage()} disabled={!activeSlideExists || generationStatus === "generating"}>Regenerate</button>
+          <button className="ghost-button" type="button" onClick={onEditPrompt}>Edit Prompt</button>
+          <span className="value-chip">{imageApproved ? "APPROVED · LOCKED" : "WORKING"}</span>
+        </div>
+
+        <button className="secondary-button full-width" type="button" onClick={() => void onGenerateAllSlides()}
           disabled={queueActive || generationStatus === "generating"}
         >
-          Generate All Slides — Draft
+          Generate All Slides — Working
         </button>
 
         {failedCount > 0 && !queueActive && (
@@ -139,8 +151,8 @@ export function CreativeDirectorPanel({
           disabled={!activeSlideExists || !backgroundReady || exportStatus === "rendering" || queueActive}
         >
           {exportStatus === "rendering"
-            ? "Generating High-Quality Final…"
-            : "Finalize All Slides — High Quality"}
+            ? "Approving Working Images…"
+            : "Approve All Working Slides"}
         </button>
 
         <button

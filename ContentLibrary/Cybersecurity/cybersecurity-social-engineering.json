@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-social-engineering",
+  "title": "Social Engineering",
+  "category": "Cybersecurity",
+  "description": "A explainer short-form Social Engineering explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 44,
+  "productionStyle": "Corporate",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "BEFORE YOU USE SOCIAL ENGINEERING, STOP FOR THIS TEN-SECOND CHECK",
+  "youtubeTitle": "Before you use social engineering, stop for this ten-second check | Social Engineering Explained",
+  "youtubeDescription": "A plain-language Social Engineering example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "Before you use social engineering, stop for this ten-second check. Here is the safer move.",
+  "instagramCaption": "Social Engineering makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#socialengineering",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with social engineering in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "Before you use social engineering, stop for this ten-second check.",
+  "voiceScript": "Before you use social engineering, stop for this ten-second check. Social Engineering means the real-world choices, risks, and protections involved in social engineering. Picture this: a phone owner encounters social engineering during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed social engineering choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific social engineering setting before continuing. Use the available social engineering protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "Use Social Engineering Safely",
+      "body": "A rushed social engineering choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "Social Engineering, In Plain English",
+      "body": "Social Engineering means the real-world choices, risks, and protections involved in social engineering.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Social Engineering Moment",
+      "body": "a phone owner encounters social engineering during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The Social Engineering Consequence",
+      "body": "a rushed social engineering choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use Social Engineering More Safely",
+      "body": "Check the source and the specific social engineering setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Social Engineering",
+      "body": "Use the available social engineering protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "social-engineering",
+    "cybersecurity",
+    "before-you-do-this",
+    "explainer"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-04-07T00:00:00.000Z",
+  "modified": "2026-04-07T00:00:00.000Z"
+}

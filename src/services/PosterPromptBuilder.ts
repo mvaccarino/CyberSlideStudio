@@ -1,5 +1,6 @@
 import { buildPosterPromptV2 } from "../ai/PromptEngine";
 import type { PosterAudience, PosterPlatform, PosterStyleId } from "../ai/types";
+import { compositionPrompt, type CompositionPlan } from "../editorial/CompositionPlan";
 
 type PosterPromptInput = {
   headline: string;
@@ -13,6 +14,7 @@ type PosterPromptInput = {
   audience?: PosterAudience;
   conceptIndex?: number;
   highlightColor?: string;
+  compositionPlan?: CompositionPlan;
 };
 
 export function buildPosterPrompt(input: PosterPromptInput): string {
@@ -28,5 +30,6 @@ export function buildPosterPrompt(input: PosterPromptInput): string {
     layoutHint: input.layout,
     conceptIndex: input.conceptIndex ?? 0,
     highlightColor: input.highlightColor ?? "#00B7FF",
+    compositionInstruction: input.compositionPlan ? compositionPrompt(input.compositionPlan) : undefined,
   }).prompt;
 }

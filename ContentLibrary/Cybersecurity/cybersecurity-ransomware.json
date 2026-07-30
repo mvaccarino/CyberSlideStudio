@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-ransomware",
+  "title": "Ransomware",
+  "category": "Cybersecurity",
+  "description": "A practical how-to short-form Ransomware explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 43,
+  "productionStyle": "Fast Social",
+  "cameraStyle": "fast focus-led pushes",
+  "captionStyle": "bold kinetic captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "A FAKE DELIVERY ATTACHMENT CAN STOP AN ENTIRE OFFICE IN MINUTES",
+  "youtubeTitle": "A fake delivery attachment can stop an entire office in minutes | Ransomware Explained",
+  "youtubeDescription": "A plain-language Ransomware example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "A fake delivery attachment can stop an entire office in minutes. Here is the safer move.",
+  "instagramCaption": "Ransomware makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#ransomware",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a small office team facing locked files while one employee disconnects a network cable; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "A fake delivery attachment can stop an entire office in minutes.",
+  "voiceScript": "A fake delivery attachment can stop an entire office in minutes. Ransomware means malicious software that encrypts files or locks systems and demands payment for access. Picture this: a worker opens a fake delivery attachment and shared files become unreadable. Here is why that matters: work can stop for days, and payment does not guarantee recovery. Keep protected backups and test restoring them. Patch devices and report suspicious attachments immediately. You do not need to be an expert. Slow down, verify the detail that matters, and choose the safer option before sharing information, money, or access. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "One Click Can Lock Everything",
+      "body": "A fake attachment can encrypt shared files, stop work, and demand payment without guaranteeing recovery.",
+      "cta": ""
+    },
+    {
+      "title": "Ransomware, In Plain English",
+      "body": "Ransomware means malicious software that encrypts files or locks systems and demands payment for access.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Ransomware Moment",
+      "body": "a worker opens a fake delivery attachment and shared files become unreadable",
+      "cta": ""
+    },
+    {
+      "title": "The Ransomware Consequence",
+      "body": "work can stop for days, and payment does not guarantee recovery",
+      "cta": ""
+    },
+    {
+      "title": "Use Ransomware More Safely",
+      "body": "Keep protected backups and test restoring them.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Ransomware",
+      "body": "Patch devices and report suspicious attachments immediately.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "ransomware",
+    "cybersecurity",
+    "warning-signs",
+    "practical-how-to"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-04-04T00:00:00.000Z",
+  "modified": "2026-04-04T00:00:00.000Z"
+}

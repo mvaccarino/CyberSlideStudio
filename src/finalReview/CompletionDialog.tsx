@@ -1,0 +1,3 @@
+export function CompletionDialog({onPublish,onTemplates,onNew}:{onPublish:()=>void;onTemplates:()=>void;onNew:()=>void}) {
+  return <div className="completion-backdrop" role="dialog" aria-modal="true" aria-labelledby="completion-title"><section className="completion-dialog"><span className="completion-check">✓</span><h1 id="completion-title">Production Complete</h1><p>Your final video is rendered and ready to review.</p><button className="publish-primary" onClick={onPublish}>🚀 Publish</button><button className="secondary-button" onClick={onTemplates}>Browse Templates</button><button className="ghost-button" onClick={onNew}>New Project</button></section></div>;
+}

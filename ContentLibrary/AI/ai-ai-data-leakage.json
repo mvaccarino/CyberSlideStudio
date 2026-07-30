@@ -1,0 +1,70 @@
+{
+  "id": "ai-ai-data-leakage",
+  "title": "AI Data Leakage",
+  "category": "Artificial Intelligence",
+  "description": "A explainer short-form AI Data Leakage explanation for beginners, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Beginners",
+  "estimatedSeconds": 39,
+  "productionStyle": "Corporate",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Minimal",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "BEFORE YOU PASTE THAT DOCUMENT INTO AI, CHECK WHAT CONFIDENTIAL DETAILS ARE INSIDE",
+  "youtubeTitle": "Before you paste that document into AI, check what confidential details are inside | AI Data Leakage Explained",
+  "youtubeDescription": "A plain-language AI Data Leakage example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "Before you paste that document into AI, check what confidential details are inside. Here is the safer move.",
+  "instagramCaption": "AI Data Leakage makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#aidataleakage",
+    "#artificialintelligence",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of an office employee pausing before pasting a confidential document into an AI chat window; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "Before you paste that document into AI, check what confidential details are inside.",
+  "voiceScript": "Before you paste that document into AI, check what confidential details are inside. AI Data Leakage means confidential information pasted into an AI tool leaving the company's direct control or being retained under the tool's terms. Picture this: an employee asks a public chatbot to summarize customer names and an unreleased price list. Here is why that matters: private data may enter vendor accounts, logs, or systems that were never approved. Remove sensitive details before using an AI tool. Use company-approved services and check retention settings. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "Use AI Data Leakage Safely",
+      "body": "Private data may enter vendor accounts, logs, or systems that were never approved.",
+      "cta": ""
+    },
+    {
+      "title": "AI Data Leakage, In Plain English",
+      "body": "AI Data Leakage means confidential information pasted into an AI tool leaving the company's direct control or being retained under the tool's terms.",
+      "cta": ""
+    },
+    {
+      "title": "A Real AI Data Leakage Moment",
+      "body": "an employee asks a public chatbot to summarize customer names and an unreleased price list",
+      "cta": ""
+    },
+    {
+      "title": "The AI Data Leakage Consequence",
+      "body": "private data may enter vendor accounts, logs, or systems that were never approved",
+      "cta": ""
+    },
+    {
+      "title": "Use AI Data Leakage More Safely",
+      "body": "Remove sensitive details before using an AI tool.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About AI Data Leakage",
+      "body": "Use company-approved services and check retention settings.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "ai-data-leakage",
+    "artificial-intelligence",
+    "before-you-do-this",
+    "explainer"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-06-09T00:00:00.000Z",
+  "modified": "2026-06-09T00:00:00.000Z"
+}

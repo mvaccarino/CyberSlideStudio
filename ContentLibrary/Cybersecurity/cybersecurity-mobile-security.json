@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-mobile-security",
+  "title": "Mobile Security",
+  "category": "Cybersecurity",
+  "description": "A story short-form Mobile Security explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 45,
+  "productionStyle": "News Report",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "IT STARTED WITH A NORMAL DAY AND ONE OVERLOOKED MOBILE SECURITY RISK",
+  "youtubeTitle": "It started with a normal day and one overlooked mobile security risk | Mobile Security Explained",
+  "youtubeDescription": "A plain-language Mobile Security example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "It started with a normal day and one overlooked mobile security risk. Here is the safer move.",
+  "instagramCaption": "Mobile Security makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#mobilesecurity",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with mobile security in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "It started with a normal day and one overlooked mobile security risk.",
+  "voiceScript": "It started with a normal day and one overlooked mobile security risk. Mobile Security means the real-world choices, risks, and protections involved in mobile security. Picture this: a phone owner encounters mobile security during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed mobile security choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific mobile security setting before continuing. Use the available mobile security protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "A Real Mobile Security Risk",
+      "body": "A rushed mobile security choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "Mobile Security, In Plain English",
+      "body": "Mobile Security means the real-world choices, risks, and protections involved in mobile security.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Mobile Security Moment",
+      "body": "a phone owner encounters mobile security during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The Mobile Security Consequence",
+      "body": "a rushed mobile security choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use Mobile Security More Safely",
+      "body": "Check the source and the specific mobile security setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Mobile Security",
+      "body": "Use the available mobile security protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "mobile-security",
+    "cybersecurity",
+    "mini-story",
+    "story"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-04-20T00:00:00.000Z",
+  "modified": "2026-04-20T00:00:00.000Z"
+}

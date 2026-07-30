@@ -1,10 +1,11 @@
-const path = require("node:path");
+﻿const path = require("node:path");
 const fs = require("node:fs/promises");
 const os = require("node:os");
 const crypto = require("node:crypto");
 const { spawn } = require("node:child_process");
 const { resolveFfmpeg } = require("./ffmpegResolver.cjs");
 const { totalDuration, validatePlan } = require("./videoPlan.cjs");
+const { escapeAssFilterPath } = require("../captions/captionEngine.cjs");
 
 const activeRenders = new Map();
 
@@ -32,9 +33,7 @@ function runProcess(executable, args, options = {}) {
       }
 
       reject(
-        new Error(
-          `FFmpeg exited with code ${code}.\n${stderr.slice(-3000)}`,
-        ),
+        new Error(`FFmpeg exited with code ${code}.\n${stderr.slice(-3000)}`),
       );
     });
 
@@ -48,7 +47,7 @@ function motionFilter(scene, width, height, fps) {
     `scale=${width + 160}:${height + 284}:force_original_aspect_ratio=increase,` +
     `crop=${width + 120}:${height + 220}`;
 
-  if (scene.motion === "slow-zoom-out") {
+  if (scene.motion === "slow-zoom-out" || scene.motion === "pull") {
     return (
       `${common},zoompan=` +
       `z='if(eq(on,1),1.075,max(1.0,zoom-0.00032))':` +
@@ -57,6 +56,14 @@ function motionFilter(scene, width, height, fps) {
     );
   }
 
+  if (scene.motion === "documentary-drift") {
+    return (
+      `${common},zoompan=` +
+      `z='min(1.055,1.015+on*0.00018)':` +
+      `x='iw/2-(iw/zoom/2)+sin(on/35)*10':y='ih/2-(ih/zoom/2)+cos(on/42)*8':` +
+      `d=${frames}:s=${width}x${height}:fps=${fps}`
+    );
+  }
   if (scene.motion === "pan-left") {
     return (
       `${common},zoompan=` +
@@ -84,6 +91,8 @@ function motionFilter(scene, width, height, fps) {
 function ffmpegTransition(value) {
   const map = {
     fade: "fade",
+    dissolve: "dissolve",
+    "cinematic-dissolve": "dissolve",
     "wipe-left": "wipeleft",
     "wipe-right": "wiperight",
     "slide-left": "slideleft",
@@ -143,8 +152,7 @@ function buildXfadeGraph(plan) {
     const scene = plan.scenes[index];
     const transitionSeconds = scene.transitionSeconds;
     const offset = Math.max(0, cumulative - transitionSeconds);
-    const output =
-      index === plan.scenes.length - 1 ? "[vout]" : `[v${index}]`;
+    const output = index === plan.scenes.length - 1 ? "[vout]" : `[v${index}]`;
 
     filters.push(
       `${previous}[${index}:v]xfade=` +
@@ -237,6 +245,61 @@ async function muxVoiceover({
   );
 }
 
+async function applyTextLayers({
+  ffmpegPath,
+  videoPath,
+  overlayPath,
+  subtitlePath,
+  outputPath,
+  registerChild,
+}) {
+  const layers = [overlayPath, subtitlePath].filter(Boolean);
+  if (!layers.length) {
+    await fs.copyFile(videoPath, outputPath);
+    return;
+  }
+  for (const layer of layers) {
+    try {
+      await fs.access(layer);
+    } catch {
+      throw new Error(`Text rendering asset is unavailable: ${layer}`);
+    }
+    if (path.extname(layer).toLowerCase() !== ".ass")
+      throw new Error(`Text rendering asset must be an ASS file: ${layer}`);
+  }
+  const filter = layers
+    .map((layer) => `ass=filename='${escapeAssFilterPath(layer)}'`)
+    .join(",");
+  try {
+    await runProcess(
+      ffmpegPath,
+      [
+        "-y",
+        "-i",
+        videoPath,
+        "-vf",
+        filter,
+        "-an",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "veryfast",
+        "-crf",
+        "18",
+        "-pix_fmt",
+        "yuv420p",
+        "-movflags",
+        "+faststart",
+        outputPath,
+      ],
+      { onChild: registerChild },
+    );
+  } catch (error) {
+    throw new Error(
+      `FFmpeg could not burn the text/subtitle layers. Verify the ASS assets and installed fonts. ${error.message}`,
+    );
+  }
+}
 async function renderNativeVideo({
   plan: rawPlan,
   outputDirectory,
@@ -280,7 +343,7 @@ async function renderNativeVideo({
 
     progress({
       phase: "preparing",
-      message: "Preparing the native video render…",
+      message: "Preparing the native video renderÃ¢â‚¬Â¦",
     });
 
     for (let index = 0; index < plan.scenes.length; index += 1) {
@@ -300,7 +363,7 @@ async function renderNativeVideo({
         percent: Math.round((index / plan.scenes.length) * 70),
         message:
           `Rendering motion for slide ${scene.slideNumber} ` +
-          `(${index + 1} of ${plan.scenes.length})…`,
+          `(${index + 1} of ${plan.scenes.length})Ã¢â‚¬Â¦`,
       });
 
       await renderScene({
@@ -320,7 +383,7 @@ async function renderNativeVideo({
       phase: "assembling",
       completedScenes: plan.scenes.length,
       percent: 76,
-      message: "Adding transitions and assembling the video…",
+      message: "Adding transitions and assembling the videoÃ¢â‚¬Â¦",
     });
 
     await assembleScenes({
@@ -331,24 +394,42 @@ async function renderNativeVideo({
       registerChild,
     });
 
-    if (plan.voiceoverPath) {
+    const layeredPath = path.join(tempDirectory, "layered.mp4");
+    progress({
+      phase: "assembling",
+      completedScenes: plan.scenes.length,
+      percent: 84,
+      message: "Burning temporary headlines and narration subtitlesâ€¦",
+    });
+    await applyTextLayers({
+      ffmpegPath: ffmpeg.path,
+      videoPath: assembledPath,
+      overlayPath: plan.overlayPath,
+      subtitlePath: plan.subtitlePath,
+      outputPath: layeredPath,
+      registerChild,
+    });
+
+    const audioPath =
+      plan.finalMixPath || plan.narrationPath || plan.voiceoverPath;
+    if (audioPath) {
       progress({
         phase: "adding-audio",
         completedScenes: plan.scenes.length,
         percent: 91,
-        message: "Normalizing and adding the voiceover…",
+        message: "Normalizing and adding the voiceoverÃ¢â‚¬Â¦",
       });
 
       await muxVoiceover({
         ffmpegPath: ffmpeg.path,
-        videoPath: assembledPath,
-        voiceoverPath: plan.voiceoverPath,
+        videoPath: layeredPath,
+        voiceoverPath: audioPath,
         outputPath,
         durationSeconds,
         registerChild,
       });
     } else {
-      await fs.copyFile(assembledPath, outputPath);
+      await fs.copyFile(layeredPath, outputPath);
     }
 
     progress({
@@ -358,7 +439,16 @@ async function renderNativeVideo({
       message: "Final MP4 render complete.",
     });
 
-    return { renderId, filePath: outputPath, durationSeconds };
+    const outputStat = await fs.stat(outputPath);
+    return {
+      renderId,
+      filePath: outputPath,
+      durationSeconds,
+      width: plan.width,
+      height: plan.height,
+      fileSizeBytes: outputStat.size,
+      renderedAt: new Date().toISOString(),
+    };
   } catch (error) {
     if (cancelled || String(error?.message).includes("cancelled")) {
       progress({

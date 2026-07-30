@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-secure-remote-work",
+  "title": "Secure Remote Work",
+  "category": "Cybersecurity",
+  "description": "A story short-form Secure Remote Work explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 48,
+  "productionStyle": "News Report",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "IT STARTED WITH A NORMAL DAY AND ONE OVERLOOKED SECURE REMOTE WORK RISK",
+  "youtubeTitle": "It started with a normal day and one overlooked secure remote work risk | Secure Remote Work Explained",
+  "youtubeDescription": "A plain-language Secure Remote Work example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "It started with a normal day and one overlooked secure remote work risk. Here is the safer move.",
+  "instagramCaption": "Secure Remote Work makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#secureremotework",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with secure remote work in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "It started with a normal day and one overlooked secure remote work risk.",
+  "voiceScript": "It started with a normal day and one overlooked secure remote work risk. Secure Remote Work means the real-world choices, risks, and protections involved in secure remote work. Picture this: a phone owner encounters secure remote work during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed secure remote work choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific secure remote work setting before continuing. Use the available secure remote work protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "A Real Secure Remote Work Risk",
+      "body": "A rushed secure remote work choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "Secure Remote Work, In Plain English",
+      "body": "Secure Remote Work means the real-world choices, risks, and protections involved in secure remote work.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Secure Remote Work Moment",
+      "body": "a phone owner encounters secure remote work during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The Secure Remote Work Consequence",
+      "body": "a rushed secure remote work choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use Secure Remote Work More Safely",
+      "body": "Check the source and the specific secure remote work setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Secure Remote Work",
+      "body": "Use the available secure remote work protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "secure-remote-work",
+    "cybersecurity",
+    "mini-story",
+    "story"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-04-27T00:00:00.000Z",
+  "modified": "2026-04-27T00:00:00.000Z"
+}

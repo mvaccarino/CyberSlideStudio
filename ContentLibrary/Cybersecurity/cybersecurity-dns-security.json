@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-dns-security",
+  "title": "DNS Security",
+  "category": "Cybersecurity",
+  "description": "A myth vs reality short-form DNS Security explanation for it professionals, using a realistic example and specific next steps.",
+  "difficulty": "Intermediate",
+  "audience": "IT Professionals",
+  "estimatedSeconds": 44,
+  "productionStyle": "Viral Short",
+  "cameraStyle": "fast focus-led pushes",
+  "captionStyle": "bold kinetic captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "MYTH: DNS SECURITY ONLY MATTERS TO TECHNICAL PEOPLE",
+  "youtubeTitle": "Myth: dns security only matters to technical people | DNS Security Explained",
+  "youtubeDescription": "A plain-language DNS Security example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "Myth: dns security only matters to technical people. Here is the safer move.",
+  "instagramCaption": "DNS Security makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#dnssecurity",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with dns security in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "Myth: dns security only matters to technical people.",
+  "voiceScript": "Myth: dns security only matters to technical people. DNS Security means the real-world choices, risks, and protections involved in dns security. Picture this: a phone owner encounters dns security during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed dns security choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific dns security setting before continuing. Use the available dns security protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "The Truth About DNS Security",
+      "body": "A rushed dns security choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "DNS Security, In Plain English",
+      "body": "DNS Security means the real-world choices, risks, and protections involved in dns security.",
+      "cta": ""
+    },
+    {
+      "title": "A Real DNS Security Moment",
+      "body": "a phone owner encounters dns security during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The DNS Security Consequence",
+      "body": "a rushed dns security choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use DNS Security More Safely",
+      "body": "Check the source and the specific dns security setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About DNS Security",
+      "body": "Use the available dns security protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "dns-security",
+    "cybersecurity",
+    "myth-vs-reality",
+    "myth-vs-reality"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-05-17T00:00:00.000Z",
+  "modified": "2026-05-17T00:00:00.000Z"
+}

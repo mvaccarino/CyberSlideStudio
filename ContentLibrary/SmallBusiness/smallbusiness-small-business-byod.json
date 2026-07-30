@@ -1,0 +1,70 @@
+{
+  "id": "smallbusiness-small-business-byod",
+  "title": "Small Business BYOD",
+  "category": "Small Business",
+  "description": "A myth vs reality short-form Small Business BYOD explanation for small business owners, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Small Business Owners",
+  "estimatedSeconds": 39,
+  "productionStyle": "Viral Short",
+  "cameraStyle": "fast focus-led pushes",
+  "captionStyle": "bold kinetic captions",
+  "musicStyle": "Inspirational",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "A PERSONAL LAPTOP CAN QUIETLY CARRY CUSTOMER DATA OUTSIDE YOUR BUSINESS",
+  "youtubeTitle": "A personal laptop can quietly carry customer data outside your business | Small Business BYOD Explained",
+  "youtubeDescription": "A plain-language Small Business BYOD example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "A personal laptop can quietly carry customer data outside your business. Here is the safer move.",
+  "instagramCaption": "Small Business BYOD makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#smallbusinessbyod",
+    "#smallbusiness",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a shop employee using a personal laptop with a company document open in a neighborhood cafe; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "A personal laptop can quietly carry customer data outside your business.",
+  "voiceScript": "A personal laptop can quietly carry customer data outside your business. Small Business BYOD means employees using their own phones or computers for work, mixing company information with personal apps and family use. Picture this: an employee downloads a customer spreadsheet to a personal laptop with no screen lock. Here is why that matters: a lost, shared, or infected device can carry company data outside the business. Set minimum device rules before allowing personal devices. Keep work data in managed apps and remove access when employment ends. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "The Truth About Small Business BYOD",
+      "body": "A lost, shared, or infected device can carry company data outside the business.",
+      "cta": ""
+    },
+    {
+      "title": "Small Business BYOD, In Plain English",
+      "body": "Small Business BYOD means employees using their own phones or computers for work, mixing company information with personal apps and family use.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Small Business BYOD Moment",
+      "body": "an employee downloads a customer spreadsheet to a personal laptop with no screen lock",
+      "cta": ""
+    },
+    {
+      "title": "The Small Business BYOD Consequence",
+      "body": "a lost, shared, or infected device can carry company data outside the business",
+      "cta": ""
+    },
+    {
+      "title": "Use Small Business BYOD More Safely",
+      "body": "Set minimum device rules before allowing personal devices.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Small Business BYOD",
+      "body": "Keep work data in managed apps and remove access when employment ends.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "small-business-byod",
+    "small-business",
+    "myth-vs-reality",
+    "myth-vs-reality"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-05-31T00:00:00.000Z",
+  "modified": "2026-05-31T00:00:00.000Z"
+}

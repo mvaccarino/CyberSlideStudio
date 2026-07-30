@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-public-wi-fi-safety",
+  "title": "Public Wi-Fi Safety",
+  "category": "Cybersecurity",
+  "description": "A myth vs reality short-form Public Wi-Fi Safety explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 46,
+  "productionStyle": "Viral Short",
+  "cameraStyle": "fast focus-led pushes",
+  "captionStyle": "bold kinetic captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "MYTH: PUBLIC WI-FI SAFETY ONLY MATTERS TO TECHNICAL PEOPLE",
+  "youtubeTitle": "Myth: public wi-fi safety only matters to technical people | Public Wi-Fi Safety Explained",
+  "youtubeDescription": "A plain-language Public Wi-Fi Safety example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "Myth: public wi-fi safety only matters to technical people. Here is the safer move.",
+  "instagramCaption": "Public Wi-Fi Safety makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#publicwifisafety",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with public wi-fi safety in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "Myth: public wi-fi safety only matters to technical people.",
+  "voiceScript": "Myth: public wi-fi safety only matters to technical people. Public Wi-Fi Safety means the real-world choices, risks, and protections involved in public wi-fi safety. Picture this: a phone owner encounters public wi-fi safety during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed public wi-fi safety choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific public wi-fi safety setting before continuing. Use the available public wi-fi safety protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "The Truth About Public Wi-Fi Safety",
+      "body": "A rushed public wi-fi safety choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "Public Wi-Fi Safety, In Plain English",
+      "body": "Public Wi-Fi Safety means the real-world choices, risks, and protections involved in public wi-fi safety.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Public Wi-Fi Safety Moment",
+      "body": "a phone owner encounters public wi-fi safety during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The Public Wi-Fi Safety Consequence",
+      "body": "a rushed public wi-fi safety choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use Public Wi-Fi Safety More Safely",
+      "body": "Check the source and the specific public wi-fi safety setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Public Wi-Fi Safety",
+      "body": "Use the available public wi-fi safety protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "public-wi-fi-safety",
+    "cybersecurity",
+    "myth-vs-reality",
+    "myth-vs-reality"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-04-05T00:00:00.000Z",
+  "modified": "2026-04-05T00:00:00.000Z"
+}

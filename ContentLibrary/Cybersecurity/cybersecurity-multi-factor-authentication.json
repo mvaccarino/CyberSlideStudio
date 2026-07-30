@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-multi-factor-authentication",
+  "title": "Multi-Factor Authentication",
+  "category": "Cybersecurity",
+  "description": "A mistake short-form Multi-Factor Authentication explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 44,
+  "productionStyle": "Educational",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "THE BIGGEST MULTI-FACTOR AUTHENTICATION MISTAKE STARTS WITH ONE RUSHED DECISION",
+  "youtubeTitle": "The biggest multi-factor authentication mistake starts with one rushed decision | Multi-Factor Authentication Explained",
+  "youtubeDescription": "A plain-language Multi-Factor Authentication example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "The biggest multi-factor authentication mistake starts with one rushed decision. Here is the safer move.",
+  "instagramCaption": "Multi-Factor Authentication makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#multifactorauthentication",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with multi-factor authentication in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "The biggest multi-factor authentication mistake starts with one rushed decision.",
+  "voiceScript": "The biggest multi-factor authentication mistake starts with one rushed decision. Multi-Factor Authentication means the real-world choices, risks, and protections involved in multi-factor authentication. Picture this: a phone owner encounters multi-factor authentication during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed multi-factor authentication choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific multi-factor authentication setting before continuing. Use the available multi-factor authentication protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "The Biggest Multi-Factor Authentication Mistake",
+      "body": "A rushed multi-factor authentication choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "Multi-Factor Authentication, In Plain English",
+      "body": "Multi-Factor Authentication means the real-world choices, risks, and protections involved in multi-factor authentication.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Multi-Factor Authentication Moment",
+      "body": "a phone owner encounters multi-factor authentication during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The Multi-Factor Authentication Consequence",
+      "body": "a rushed multi-factor authentication choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use Multi-Factor Authentication More Safely",
+      "body": "Check the source and the specific multi-factor authentication setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Multi-Factor Authentication",
+      "body": "Use the available multi-factor authentication protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "multi-factor-authentication",
+    "cybersecurity",
+    "biggest-mistake",
+    "mistake"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-04-03T00:00:00.000Z",
+  "modified": "2026-04-03T00:00:00.000Z"
+}

@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-qr-code-phishing",
+  "title": "QR Code Phishing",
+  "category": "Cybersecurity",
+  "description": "A warning short-form QR Code Phishing explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 48,
+  "productionStyle": "Cybersecurity Professional",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "direct and calm",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "ONE ORDINARY QR CODE PHISHING MISTAKE CAN CREATE A PROBLEM YOU NEVER SEE COMING",
+  "youtubeTitle": "One ordinary qr code phishing mistake can create a problem you never see coming | QR Code Phishing Explained",
+  "youtubeDescription": "A plain-language QR Code Phishing example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "One ordinary qr code phishing mistake can create a problem you never see coming. Here is the safer move.",
+  "instagramCaption": "QR Code Phishing makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#qrcodephishing",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with qr code phishing in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "One ordinary qr code phishing mistake can create a problem you never see coming.",
+  "voiceScript": "One ordinary qr code phishing mistake can create a problem you never see coming. QR Code Phishing means the real-world choices, risks, and protections involved in qr code phishing. Picture this: a phone owner encounters qr code phishing during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed qr code phishing choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific qr code phishing setting before continuing. Use the available qr code phishing protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "The Hidden QR Code Phishing Risk",
+      "body": "A rushed qr code phishing choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "QR Code Phishing, In Plain English",
+      "body": "QR Code Phishing means the real-world choices, risks, and protections involved in qr code phishing.",
+      "cta": ""
+    },
+    {
+      "title": "A Real QR Code Phishing Moment",
+      "body": "a phone owner encounters qr code phishing during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The QR Code Phishing Consequence",
+      "body": "a rushed qr code phishing choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use QR Code Phishing More Safely",
+      "body": "Check the source and the specific qr code phishing setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About QR Code Phishing",
+      "body": "Use the available qr code phishing protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "qr-code-phishing",
+    "cybersecurity",
+    "what-could-happen",
+    "warning"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-04-15T00:00:00.000Z",
+  "modified": "2026-04-15T00:00:00.000Z"
+}

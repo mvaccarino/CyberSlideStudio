@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-cloud-security",
+  "title": "Cloud Security",
+  "category": "Cybersecurity",
+  "description": "A explainer short-form Cloud Security explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 44,
+  "productionStyle": "Corporate",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "BEFORE YOU USE CLOUD SECURITY, STOP FOR THIS TEN-SECOND CHECK",
+  "youtubeTitle": "Before you use cloud security, stop for this ten-second check | Cloud Security Explained",
+  "youtubeDescription": "A plain-language Cloud Security example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "Before you use cloud security, stop for this ten-second check. Here is the safer move.",
+  "instagramCaption": "Cloud Security makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#cloudsecurity",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with cloud security in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "Before you use cloud security, stop for this ten-second check.",
+  "voiceScript": "Before you use cloud security, stop for this ten-second check. Cloud Security means the real-world choices, risks, and protections involved in cloud security. Picture this: a phone owner encounters cloud security during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed cloud security choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific cloud security setting before continuing. Use the available cloud security protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "Use Cloud Security Safely",
+      "body": "A rushed cloud security choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "Cloud Security, In Plain English",
+      "body": "Cloud Security means the real-world choices, risks, and protections involved in cloud security.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Cloud Security Moment",
+      "body": "a phone owner encounters cloud security during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The Cloud Security Consequence",
+      "body": "a rushed cloud security choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use Cloud Security More Safely",
+      "body": "Check the source and the specific cloud security setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Cloud Security",
+      "body": "Use the available cloud security protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "cloud-security",
+    "cybersecurity",
+    "before-you-do-this",
+    "explainer"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-04-21T00:00:00.000Z",
+  "modified": "2026-04-21T00:00:00.000Z"
+}

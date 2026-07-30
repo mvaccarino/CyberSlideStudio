@@ -1,0 +1,70 @@
+{
+  "id": "privacy-data-brokers",
+  "title": "Data Brokers",
+  "category": "Privacy",
+  "description": "A myth vs reality short-form Data Brokers explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 37,
+  "productionStyle": "Viral Short",
+  "cameraStyle": "fast focus-led pushes",
+  "captionStyle": "bold kinetic captions",
+  "musicStyle": "Inspirational",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "A STRANGER MAY BE ABLE TO BUY A PROFILE BUILT FROM YOUR PERSONAL INFORMATION",
+  "youtubeTitle": "A stranger may be able to buy a profile built from your personal information | Data Brokers Explained",
+  "youtubeDescription": "A plain-language Data Brokers example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "A stranger may be able to buy a profile built from your personal information. Here is the safer move.",
+  "instagramCaption": "Data Brokers makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#databrokers",
+    "#privacy",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a consumer reviewing a printed personal-data report at a home desk with sensitive details obscured; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "A stranger may be able to buy a profile built from your personal information.",
+  "voiceScript": "A stranger may be able to buy a profile built from your personal information. Data Brokers means companies that collect details from records, apps, purchases, and websites, combine them into profiles, and sell or share them. Picture this: a stranger buys a report containing someone's old addresses, relatives, and interests. Here is why that matters: the profile can support targeted scams or expose private information. Search major broker sites for your own information. Use their opt-out process and repeat the check later. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "The Truth About Data Brokers",
+      "body": "The profile can support targeted scams or expose private information.",
+      "cta": ""
+    },
+    {
+      "title": "Data Brokers, In Plain English",
+      "body": "Data Brokers means companies that collect details from records, apps, purchases, and websites, combine them into profiles, and sell or share them.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Data Brokers Moment",
+      "body": "a stranger buys a report containing someone's old addresses, relatives, and interests",
+      "cta": ""
+    },
+    {
+      "title": "The Data Brokers Consequence",
+      "body": "the profile can support targeted scams or expose private information",
+      "cta": ""
+    },
+    {
+      "title": "Use Data Brokers More Safely",
+      "body": "Search major broker sites for your own information.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Data Brokers",
+      "body": "Use their opt-out process and repeat the check later.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "data-brokers",
+    "privacy",
+    "myth-vs-reality",
+    "myth-vs-reality"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-06-21T00:00:00.000Z",
+  "modified": "2026-06-21T00:00:00.000Z"
+}

@@ -1,0 +1,70 @@
+{
+  "id": "ai-human-in-the-loop",
+  "title": "Human in the Loop",
+  "category": "Artificial Intelligence",
+  "description": "A explainer short-form Human in the Loop explanation for beginners, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Beginners",
+  "estimatedSeconds": 50,
+  "productionStyle": "Corporate",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Minimal",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "BEFORE YOU USE HUMAN IN THE LOOP, STOP FOR THIS TEN-SECOND CHECK",
+  "youtubeTitle": "Before you use human in the loop, stop for this ten-second check | Human in the Loop Explained",
+  "youtubeDescription": "A plain-language Human in the Loop example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "Before you use human in the loop, stop for this ten-second check. Here is the safer move.",
+  "instagramCaption": "Human in the Loop makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#humanintheloop",
+    "#artificialintelligence",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of an office worker dealing with human in the loop in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "Before you use human in the loop, stop for this ten-second check.",
+  "voiceScript": "Before you use human in the loop, stop for this ten-second check. Human in the Loop means the real-world choices, risks, and protections involved in human in the loop. Picture this: an office worker encounters human in the loop during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed human in the loop choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific human in the loop setting before continuing. Use the available human in the loop protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "Use Human in the Loop Safely",
+      "body": "A rushed human in the loop choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "Human in the Loop, In Plain English",
+      "body": "Human in the Loop means the real-world choices, risks, and protections involved in human in the loop.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Human in the Loop Moment",
+      "body": "an office worker encounters human in the loop during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The Human in the Loop Consequence",
+      "body": "a rushed human in the loop choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use Human in the Loop More Safely",
+      "body": "Check the source and the specific human in the loop setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Human in the Loop",
+      "body": "Use the available human in the loop protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "human-in-the-loop",
+    "artificial-intelligence",
+    "before-you-do-this",
+    "explainer"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-06-16T00:00:00.000Z",
+  "modified": "2026-06-16T00:00:00.000Z"
+}

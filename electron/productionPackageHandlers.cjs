@@ -27,7 +27,7 @@ async function writePdf(html, filePath) {
 function registerProductionPackageHandlers({ ensureWorkspace }) {
   ipcMain.handle("production:export-package", async (_event, payload) => {
     const workspace = await ensureWorkspace(payload?.projectName);
-    const root = workspace.production;
+    const root = workspace.productionPackage;
 
     await fs.rm(root, { recursive: true, force: true });
     await fs.mkdir(root, { recursive: true });
@@ -55,6 +55,14 @@ function registerProductionPackageHandlers({ ensureWorkspace }) {
       await fs.writeFile(filePath, Buffer.from(base64, "base64"));
     }
 
+    for (const attachment of payload?.attachments ?? []) {
+      const source = path.resolve(String(attachment.sourcePath || ""));
+      const destination = path.join(root, String(attachment.relativePath || ""));
+      const allowed = new Set([".wav", ".json", ".srt", ".ass"]);
+      if (!allowed.has(path.extname(source).toLowerCase())) throw new Error("Unsupported production-package attachment type.");
+      await fs.mkdir(path.dirname(destination), { recursive: true });
+      await fs.copyFile(source, destination);
+    }
     for (const pdf of payload?.pdfs ?? []) {
       await writePdf(pdf.html, path.join(root, pdf.relativePath));
     }

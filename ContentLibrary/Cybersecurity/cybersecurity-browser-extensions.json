@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-browser-extensions",
+  "title": "Browser Extensions",
+  "category": "Cybersecurity",
+  "description": "A myth vs reality short-form Browser Extensions explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 45,
+  "productionStyle": "Viral Short",
+  "cameraStyle": "fast focus-led pushes",
+  "captionStyle": "bold kinetic captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "THAT TINY BROWSER ADD-ON MAY SEE EVERY PAGE YOU OPEN",
+  "youtubeTitle": "That tiny browser add-on may see every page you open | Browser Extensions Explained",
+  "youtubeDescription": "A plain-language Browser Extensions example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "That tiny browser add-on may see every page you open. Here is the safer move.",
+  "instagramCaption": "Browser Extensions makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#browserextensions",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a laptop user reviewing extension permissions with one suspicious add-on highlighted; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "That tiny browser add-on may see every page you open.",
+  "voiceScript": "That tiny browser add-on may see every page you open. Browser Extensions means browser add-ons that may read browsing data, alter pages, or request access to every website you visit. Picture this: a free coupon extension gains access to email, shopping, and work pages. Here is why that matters: an unnecessary or compromised extension can observe far more than its small icon suggests. Remove extensions you no longer use. Check permissions and use a trusted publisher. You do not need to be an expert. Slow down, verify the detail that matters, and choose the safer option before sharing information, money, or access. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "The Truth About Browser Extensions",
+      "body": "An unnecessary or compromised extension can observe far more than its small icon suggests.",
+      "cta": ""
+    },
+    {
+      "title": "Browser Extensions, In Plain English",
+      "body": "Browser Extensions means browser add-ons that may read browsing data, alter pages, or request access to every website you visit.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Browser Extensions Moment",
+      "body": "a free coupon extension gains access to email, shopping, and work pages",
+      "cta": ""
+    },
+    {
+      "title": "The Browser Extensions Consequence",
+      "body": "an unnecessary or compromised extension can observe far more than its small icon suggests",
+      "cta": ""
+    },
+    {
+      "title": "Use Browser Extensions More Safely",
+      "body": "Remove extensions you no longer use.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Browser Extensions",
+      "body": "Check permissions and use a trusted publisher.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "browser-extensions",
+    "cybersecurity",
+    "myth-vs-reality",
+    "myth-vs-reality"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-04-19T00:00:00.000Z",
+  "modified": "2026-04-19T00:00:00.000Z"
+}

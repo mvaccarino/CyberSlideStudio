@@ -1,23 +1,38 @@
-const secureStore = require("./secureStore.cjs");
+﻿const secureStore = require("./secureStore.cjs");
 const fluxService = require("./fluxService.cjs");
 const openAIImageService = require("./openAIImageService.cjs");
 const {
   registerProductionPackageHandlers,
 } = require("./productionPackageHandlers.cjs");
 const { app, BrowserWindow, Menu, dialog, ipcMain } = require("electron");
-const { registerCyberSlideVoiceHandlers } = require("./voice/registerVoiceHandlers.cjs");
+const {
+  registerCyberSlideVoiceHandlers,
+} = require("./voice/registerVoiceHandlers.cjs");
+const {
+  registerNativeVideoHandlers,
+} = require("./video/registerVideoHandlers.cjs");
+const { registerMusicHandlers } = require("./music/registerMusicHandlers.cjs");
+const {
+  registerLibraryHandlers,
+} = require("./library/registerLibraryHandlers.cjs");
+const {
+  registerCaptionHandlers,
+} = require("./captions/registerCaptionHandlers.cjs");
 const path = require("node:path");
 const fs = require("node:fs/promises");
+const { migrateLegacyAssets } = require("./workspaceMigration.cjs");
 
 let mainWindow = null;
 let currentProjectPath = null;
 
 function sanitizeProjectName(value) {
-  return String(value || "CyberSlide Project")
-    .replace(/[<>:"/\\|?*]/g, "")
-    .replace(/[\r\n\t]/g, "")
-    .trim()
-    .replace(/[. ]+$/g, "") || "CyberSlide Project";
+  return (
+    String(value || "CyberSlide Project")
+      .replace(/[<>:"/\\|?*]/g, "")
+      .replace(/[\r\n\t]/g, "")
+      .trim()
+      .replace(/[. ]+$/g, "") || "CyberSlide Project"
+  );
 }
 
 function workspaceRoot() {
@@ -32,26 +47,57 @@ function projectWorkspace(projectName) {
     name,
     root,
     projectFile: path.join(root, `${name}.cslide`),
-    draft: path.join(root, "Draft"),
-    final: path.join(root, "Final"),
-    production: path.join(root, "Production Package"),
+    working: path.join(root, "Working"),
+    approved: path.join(root, "Approved"),
+    productionPackage: path.join(root, "Production Package"),
     history: path.join(root, "History"),
     cache: path.join(root, "Cache"),
     voiceover: path.join(root, "Voiceover"),
+    audio: path.join(root, "Audio"),
+    video: path.join(root, "Video"),
+    captions: path.join(root, "Captions"),
+    legacyDraft: path.join(root, "Draft"),
+    legacyFinal: path.join(root, "Final"),
   };
+}
+
+const ACTIVE_WORKSPACE_DIRECTORIES = [
+  "root",
+  "working",
+  "approved",
+  "productionPackage",
+  "history",
+  "cache",
+  "voiceover",
+  "audio",
+  "video",
+];
+
+function validateWorkspace(workspace) {
+  for (const property of ACTIVE_WORKSPACE_DIRECTORIES) {
+    const value = workspace?.[property];
+    if (typeof value !== "string" || !value.trim()) {
+      throw new Error(
+        `Invalid workspace contract: "${property}" must be a defined path string.`,
+      );
+    }
+    if (!path.isAbsolute(value)) {
+      throw new Error(
+        `Invalid workspace contract: "${property}" must be an absolute path. Received "${value}".`,
+      );
+    }
+  }
 }
 
 async function ensureWorkspace(projectName) {
   const workspace = projectWorkspace(projectName);
-  await Promise.all([
-    fs.mkdir(workspace.root, { recursive: true }),
-    fs.mkdir(workspace.draft, { recursive: true }),
-    fs.mkdir(workspace.final, { recursive: true }),
-    fs.mkdir(workspace.production, { recursive: true }),
-    fs.mkdir(workspace.history, { recursive: true }),
-    fs.mkdir(workspace.cache, { recursive: true }),
-    fs.mkdir(workspace.voiceover, { recursive: true }),
-  ]);
+  validateWorkspace(workspace);
+  await Promise.all(
+    ACTIVE_WORKSPACE_DIRECTORIES.map((property) =>
+      fs.mkdir(workspace[property], { recursive: true }),
+    ),
+  );
+  await migrateLegacyAssets(workspace);
   return workspace;
 }
 
@@ -72,7 +118,7 @@ function buildApplicationMenu() {
           click: () => sendMenuAction("new"),
         },
         {
-          label: "Open Project…",
+          label: "Open Project...",
           accelerator: "CmdOrCtrl+O",
           click: () => sendMenuAction("open"),
         },
@@ -83,7 +129,7 @@ function buildApplicationMenu() {
           click: () => sendMenuAction("save"),
         },
         {
-          label: "Save As…",
+          label: "Save As...",
           accelerator: "CmdOrCtrl+Shift+S",
           click: () => sendMenuAction("saveAs"),
         },
@@ -160,7 +206,9 @@ ipcMain.handle(
   "project:save",
   async (_event, { contents, suggestedName, forceSaveAs }) => {
     const workspace = await ensureWorkspace(suggestedName);
-    let filePath = forceSaveAs ? await chooseSavePath(workspace.name) : currentProjectPath;
+    let filePath = forceSaveAs
+      ? await chooseSavePath(workspace.name)
+      : currentProjectPath;
 
     if (!filePath) {
       filePath = workspace.projectFile;
@@ -176,8 +224,44 @@ ipcMain.handle(
   },
 );
 
+ipcMain.handle("project:open-recent", async (_event, requestedPath) => {
+  const filePath = path.resolve(String(requestedPath || ""));
+  if (
+    !path.isAbsolute(filePath) ||
+    path.extname(filePath).toLowerCase() !== ".cslide"
+  )
+    throw new Error("Recent project path must be an absolute .cslide file.");
+  const contents = await fs.readFile(filePath, "utf8");
+  currentProjectPath = filePath;
+  return { filePath, contents };
+});
 ipcMain.handle("project:clear-current-path", () => {
   currentProjectPath = null;
+});
+
+ipcMain.handle("slide:approve", async (_event, payload) => {
+  const { sourcePath, slideNumber, projectName } = payload || {};
+  if (!Number.isInteger(slideNumber) || slideNumber < 1)
+    throw new Error("A valid slide number is required.");
+  const workspace = await ensureWorkspace(projectName);
+  const source = path.resolve(String(sourcePath || ""));
+  const allowed = path.resolve(workspace.working) + path.sep;
+  if (!source.startsWith(allowed))
+    throw new Error("Only a Working image can be approved.");
+  await fs.access(source);
+  const filePath = path.join(
+    workspace.approved,
+    `slide-${String(slideNumber).padStart(2, "0")}-approved.png`,
+  );
+  await fs.copyFile(source, filePath);
+  return { filePath, approvedAt: new Date().toISOString() };
+});
+
+ipcMain.handle("slide:read-image", async (_event, filePath) => {
+  const resolved = path.resolve(String(filePath || ""));
+  if (!resolved.toLowerCase().endsWith(".png"))
+    throw new Error("Only PNG slide images are supported.");
+  return `data:image/png;base64,${(await fs.readFile(resolved)).toString("base64")}`;
 });
 
 ipcMain.handle("slide:save-final", async (_event, payload) => {
@@ -194,7 +278,7 @@ ipcMain.handle("slide:save-final", async (_event, payload) => {
 
   const workspace = await ensureWorkspace(projectName);
   const filename = `slide-${String(slideNumber).padStart(2, "0")}-final.png`;
-  const filePath = path.join(workspace.final, filename);
+  const filePath = path.join(workspace.approved, filename);
   const base64 = dataUrl.replace(/^data:image\/png;base64,/, "");
   await fs.writeFile(filePath, Buffer.from(base64, "base64"));
   return { filePath };
@@ -208,9 +292,8 @@ ipcMain.handle("openai:save-api-key", async (_event, apiKey) => {
   return true;
 });
 
-ipcMain.handle(
-  "openai:has-api-key",
-  async () => secureStore.hasSecret("openAIApiKey"),
+ipcMain.handle("openai:has-api-key", async () =>
+  secureStore.hasSecret("openAIApiKey"),
 );
 
 ipcMain.handle("openai:test-connection", async () => {
@@ -229,10 +312,8 @@ ipcMain.handle("openai:generate-posters", async (_event, payload) => {
   }
 
   const workspace = await ensureWorkspace(payload?.projectName);
-  const quality = payload?.quality || "low";
-  const outputDirectory = quality === "high"
-    ? workspace.final
-    : workspace.draft;
+  const quality = payload?.quality || "high";
+  const outputDirectory = workspace.working;
 
   const generated = await openAIImageService.generatePosters({
     apiKey,
@@ -240,6 +321,7 @@ ipcMain.handle("openai:generate-posters", async (_event, payload) => {
     count: payload?.count,
     quality,
     size: "1088x1920",
+    subtitleSafeArea: payload?.subtitleSafeArea,
   });
 
   const posters = [];
@@ -247,9 +329,8 @@ ipcMain.handle("openai:generate-posters", async (_event, payload) => {
     const image = generated[index];
     const buffer = Buffer.from(image.base64, "base64");
     const suffix = generated.length > 1 ? `-concept-${index + 1}` : "";
-    const stage = quality === "high" ? "final" : "draft";
-    const filename =
-      `slide-${String(slideNumber).padStart(2, "0")}${suffix}-${stage}.png`;
+    const stage = "working";
+    const filename = `slide-${String(slideNumber).padStart(2, "0")}${suffix}-${stage}.png`;
     const filePath = path.join(outputDirectory, filename);
     await fs.writeFile(filePath, buffer);
     posters.push({
@@ -317,7 +398,17 @@ registerProductionPackageHandlers({
   ensureWorkspace,
 });
 
-registerCyberSlideVoiceHandlers({ ensureWorkspace, getMainWindow: () => mainWindow });
+registerCyberSlideVoiceHandlers({
+  ensureWorkspace,
+  getMainWindow: () => mainWindow,
+});
+registerNativeVideoHandlers({
+  ensureWorkspace,
+  getMainWindow: () => mainWindow,
+});
+registerMusicHandlers({ ensureWorkspace });
+registerLibraryHandlers({ ipcMain, app });
+registerCaptionHandlers({ ensureWorkspace });
 
 app.whenReady().then(() => {
   buildApplicationMenu();

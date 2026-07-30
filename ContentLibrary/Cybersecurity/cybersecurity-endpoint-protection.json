@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-endpoint-protection",
+  "title": "Endpoint Protection",
+  "category": "Cybersecurity",
+  "description": "A warning short-form Endpoint Protection explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 36,
+  "productionStyle": "Cybersecurity Professional",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "direct and calm",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "YOUR ANTIVIRUS MIGHT BE MISSING THE BEHAVIOR THAT GIVES AN ATTACK AWAY",
+  "youtubeTitle": "Your antivirus might be missing the behavior that gives an attack away | Endpoint Protection Explained",
+  "youtubeDescription": "A plain-language Endpoint Protection example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "Your antivirus might be missing the behavior that gives an attack away. Here is the safer move.",
+  "instagramCaption": "Endpoint Protection makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#endpointprotection",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of an office employee studying a red security alert on a laptop while nearby workstations remain visible; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "Your antivirus might be missing the behavior that gives an attack away.",
+  "voiceScript": "Your antivirus might be missing the behavior that gives an attack away. Endpoint Protection means software that watches laptops, desktops, and other devices for malicious behavior and can isolate threats before they spread. Picture this: an employee opens a fake invoice and the laptop starts making unusual network connections. Here is why that matters: one infected device can expose passwords, files, and the company network. Install endpoint protection on every work device. Keep it updated and investigate its alerts. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "Your Antivirus Isn't Enough",
+      "body": "One infected laptop can expose files, passwords, and the rest of your business network.",
+      "cta": ""
+    },
+    {
+      "title": "Endpoint Protection, In Plain English",
+      "body": "Endpoint Protection means software that watches laptops, desktops, and other devices for malicious behavior and can isolate threats before they spread.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Endpoint Protection Moment",
+      "body": "an employee opens a fake invoice and the laptop starts making unusual network connections",
+      "cta": ""
+    },
+    {
+      "title": "The Endpoint Protection Consequence",
+      "body": "one infected device can expose passwords, files, and the company network",
+      "cta": ""
+    },
+    {
+      "title": "Use Endpoint Protection More Safely",
+      "body": "Install endpoint protection on every work device.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Endpoint Protection",
+      "body": "Keep it updated and investigate its alerts.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "endpoint-protection",
+    "cybersecurity",
+    "what-could-happen",
+    "warning"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-04-22T00:00:00.000Z",
+  "modified": "2026-04-22T00:00:00.000Z"
+}

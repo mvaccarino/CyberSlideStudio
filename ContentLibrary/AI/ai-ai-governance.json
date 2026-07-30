@@ -1,0 +1,70 @@
+{
+  "id": "ai-ai-governance",
+  "title": "AI Governance",
+  "category": "Artificial Intelligence",
+  "description": "A myth vs reality short-form AI Governance explanation for executives, using a realistic example and specific next steps.",
+  "difficulty": "Intermediate",
+  "audience": "Executives",
+  "estimatedSeconds": 44,
+  "productionStyle": "Viral Short",
+  "cameraStyle": "fast focus-led pushes",
+  "captionStyle": "bold kinetic captions",
+  "musicStyle": "Minimal",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "MYTH: AI GOVERNANCE ONLY MATTERS TO TECHNICAL PEOPLE",
+  "youtubeTitle": "Myth: ai governance only matters to technical people | AI Governance Explained",
+  "youtubeDescription": "A plain-language AI Governance example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "Myth: ai governance only matters to technical people. Here is the safer move.",
+  "instagramCaption": "AI Governance makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#aigovernance",
+    "#artificialintelligence",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of an office worker dealing with ai governance in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "Myth: ai governance only matters to technical people.",
+  "voiceScript": "Myth: ai governance only matters to technical people. AI Governance means the real-world choices, risks, and protections involved in ai governance. Picture this: an office worker encounters ai governance during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed ai governance choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific ai governance setting before continuing. Use the available ai governance protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "The Truth About AI Governance",
+      "body": "A rushed ai governance choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "AI Governance, In Plain English",
+      "body": "AI Governance means the real-world choices, risks, and protections involved in ai governance.",
+      "cta": ""
+    },
+    {
+      "title": "A Real AI Governance Moment",
+      "body": "an office worker encounters ai governance during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The AI Governance Consequence",
+      "body": "a rushed ai governance choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use AI Governance More Safely",
+      "body": "Check the source and the specific ai governance setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About AI Governance",
+      "body": "Use the available ai governance protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "ai-governance",
+    "artificial-intelligence",
+    "myth-vs-reality",
+    "myth-vs-reality"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-06-14T00:00:00.000Z",
+  "modified": "2026-06-14T00:00:00.000Z"
+}

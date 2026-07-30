@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-account-recovery",
+  "title": "Account Recovery",
+  "category": "Cybersecurity",
+  "description": "A explainer short-form Account Recovery explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 44,
+  "productionStyle": "Corporate",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "BEFORE YOU USE ACCOUNT RECOVERY, STOP FOR THIS TEN-SECOND CHECK",
+  "youtubeTitle": "Before you use account recovery, stop for this ten-second check | Account Recovery Explained",
+  "youtubeDescription": "A plain-language Account Recovery example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "Before you use account recovery, stop for this ten-second check. Here is the safer move.",
+  "instagramCaption": "Account Recovery makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#accountrecovery",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with account recovery in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "Before you use account recovery, stop for this ten-second check.",
+  "voiceScript": "Before you use account recovery, stop for this ten-second check. Account Recovery means the real-world choices, risks, and protections involved in account recovery. Picture this: a phone owner encounters account recovery during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed account recovery choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific account recovery setting before continuing. Use the available account recovery protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "Use Account Recovery Safely",
+      "body": "A rushed account recovery choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "Account Recovery, In Plain English",
+      "body": "Account Recovery means the real-world choices, risks, and protections involved in account recovery.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Account Recovery Moment",
+      "body": "a phone owner encounters account recovery during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The Account Recovery Consequence",
+      "body": "a rushed account recovery choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use Account Recovery More Safely",
+      "body": "Check the source and the specific account recovery setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Account Recovery",
+      "body": "Use the available account recovery protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "account-recovery",
+    "cybersecurity",
+    "before-you-do-this",
+    "explainer"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-05-12T00:00:00.000Z",
+  "modified": "2026-05-12T00:00:00.000Z"
+}

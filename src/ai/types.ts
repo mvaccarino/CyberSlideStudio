@@ -19,6 +19,7 @@ export type PosterBrief = {
   layoutHint: string;
   conceptIndex: number;
   highlightColor: string;
+  compositionInstruction?: string;
 };
 
 export type PosterPromptResult = {

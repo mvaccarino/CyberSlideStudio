@@ -1,0 +1,70 @@
+{
+  "id": "familysafety-digital-footprint",
+  "title": "Digital Footprint",
+  "category": "Family Safety",
+  "description": "A warning short-form Digital Footprint explanation for parents, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Parents",
+  "estimatedSeconds": 46,
+  "productionStyle": "Cybersecurity Professional",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Inspirational",
+  "voiceStyle": "direct and calm",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "ONE ORDINARY DIGITAL FOOTPRINT MISTAKE CAN CREATE A PROBLEM YOU NEVER SEE COMING",
+  "youtubeTitle": "One ordinary digital footprint mistake can create a problem you never see coming | Digital Footprint Explained",
+  "youtubeDescription": "A plain-language Digital Footprint example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "One ordinary digital footprint mistake can create a problem you never see coming. Here is the safer move.",
+  "instagramCaption": "Digital Footprint makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#digitalfootprint",
+    "#familysafety",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a parent and child dealing with digital footprint in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "One ordinary digital footprint mistake can create a problem you never see coming.",
+  "voiceScript": "One ordinary digital footprint mistake can create a problem you never see coming. Digital Footprint means the real-world choices, risks, and protections involved in digital footprint. Picture this: a parent and child encounters digital footprint during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed digital footprint choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific digital footprint setting before continuing. Use the available digital footprint protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "The Hidden Digital Footprint Risk",
+      "body": "A rushed digital footprint choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "Digital Footprint, In Plain English",
+      "body": "Digital Footprint means the real-world choices, risks, and protections involved in digital footprint.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Digital Footprint Moment",
+      "body": "a parent and child encounters digital footprint during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The Digital Footprint Consequence",
+      "body": "a rushed digital footprint choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use Digital Footprint More Safely",
+      "body": "Check the source and the specific digital footprint setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Digital Footprint",
+      "body": "Use the available digital footprint protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "digital-footprint",
+    "family-safety",
+    "what-could-happen",
+    "warning"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-07-08T00:00:00.000Z",
+  "modified": "2026-07-08T00:00:00.000Z"
+}

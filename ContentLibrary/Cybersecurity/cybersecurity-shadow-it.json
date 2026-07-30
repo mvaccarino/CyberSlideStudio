@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-shadow-it",
+  "title": "Shadow IT",
+  "category": "Cybersecurity",
+  "description": "A practical how-to short-form Shadow IT explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 46,
+  "productionStyle": "Fast Social",
+  "cameraStyle": "fast focus-led pushes",
+  "captionStyle": "bold kinetic captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "THESE SHADOW IT CLUES ARE EASY TO MISS UNTIL THE DAMAGE IS DONE",
+  "youtubeTitle": "These shadow it clues are easy to miss until the damage is done | Shadow IT Explained",
+  "youtubeDescription": "A plain-language Shadow IT example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "These shadow it clues are easy to miss until the damage is done. Here is the safer move.",
+  "instagramCaption": "Shadow IT makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#shadowit",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with shadow it in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "These shadow it clues are easy to miss until the damage is done.",
+  "voiceScript": "These shadow it clues are easy to miss until the damage is done. Shadow IT means the real-world choices, risks, and protections involved in shadow it. Picture this: a phone owner encounters shadow it during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed shadow it choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific shadow it setting before continuing. Use the available shadow it protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "Shadow IT Warning Signs",
+      "body": "A rushed shadow it choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "Shadow IT, In Plain English",
+      "body": "Shadow IT means the real-world choices, risks, and protections involved in shadow it.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Shadow IT Moment",
+      "body": "a phone owner encounters shadow it during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The Shadow IT Consequence",
+      "body": "a rushed shadow it choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use Shadow IT More Safely",
+      "body": "Check the source and the specific shadow it setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Shadow IT",
+      "body": "Use the available shadow it protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "shadow-it",
+    "cybersecurity",
+    "warning-signs",
+    "practical-how-to"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-05-09T00:00:00.000Z",
+  "modified": "2026-05-09T00:00:00.000Z"
+}

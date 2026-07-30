@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-phishing-emails",
+  "title": "Phishing Emails",
+  "category": "Cybersecurity",
+  "description": "A curiosity short-form Phishing Emails explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 45,
+  "productionStyle": "Netflix Documentary",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "BEFORE YOU TRUST PHISHING EMAILS, KNOW WHAT IT CAN ACTUALLY DO",
+  "youtubeTitle": "Before you trust phishing emails, know what it can actually do | Phishing Emails Explained",
+  "youtubeDescription": "A plain-language Phishing Emails example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "Before you trust phishing emails, know what it can actually do. Here is the safer move.",
+  "instagramCaption": "Phishing Emails makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#phishingemails",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with phishing emails in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "Before you trust phishing emails, know what it can actually do.",
+  "voiceScript": "Before you trust phishing emails, know what it can actually do. Phishing Emails means the real-world choices, risks, and protections involved in phishing emails. Picture this: a phone owner encounters phishing emails during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed phishing emails choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific phishing emails setting before continuing. Use the available phishing emails protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "Before You Trust Phishing Emails",
+      "body": "A rushed phishing emails choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "Phishing Emails, In Plain English",
+      "body": "Phishing Emails means the real-world choices, risks, and protections involved in phishing emails.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Phishing Emails Moment",
+      "body": "a phone owner encounters phishing emails during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The Phishing Emails Consequence",
+      "body": "a rushed phishing emails choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use Phishing Emails More Safely",
+      "body": "Check the source and the specific phishing emails setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Phishing Emails",
+      "body": "Use the available phishing emails protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "phishing-emails",
+    "cybersecurity",
+    "what-is-it",
+    "curiosity"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-04-02T00:00:00.000Z",
+  "modified": "2026-04-02T00:00:00.000Z"
+}

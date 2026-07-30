@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-threat-intelligence",
+  "title": "Threat Intelligence",
+  "category": "Cybersecurity",
+  "description": "A explainer short-form Threat Intelligence explanation for it professionals, using a realistic example and specific next steps.",
+  "difficulty": "Intermediate",
+  "audience": "IT Professionals",
+  "estimatedSeconds": 44,
+  "productionStyle": "Corporate",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "BEFORE YOU USE THREAT INTELLIGENCE, STOP FOR THIS TEN-SECOND CHECK",
+  "youtubeTitle": "Before you use threat intelligence, stop for this ten-second check | Threat Intelligence Explained",
+  "youtubeDescription": "A plain-language Threat Intelligence example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "Before you use threat intelligence, stop for this ten-second check. Here is the safer move.",
+  "instagramCaption": "Threat Intelligence makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#threatintelligence",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with threat intelligence in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "Before you use threat intelligence, stop for this ten-second check.",
+  "voiceScript": "Before you use threat intelligence, stop for this ten-second check. Threat Intelligence means the real-world choices, risks, and protections involved in threat intelligence. Picture this: a phone owner encounters threat intelligence during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed threat intelligence choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific threat intelligence setting before continuing. Use the available threat intelligence protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "Use Threat Intelligence Safely",
+      "body": "A rushed threat intelligence choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "Threat Intelligence, In Plain English",
+      "body": "Threat Intelligence means the real-world choices, risks, and protections involved in threat intelligence.",
+      "cta": ""
+    },
+    {
+      "title": "A Real Threat Intelligence Moment",
+      "body": "a phone owner encounters threat intelligence during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The Threat Intelligence Consequence",
+      "body": "a rushed threat intelligence choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use Threat Intelligence More Safely",
+      "body": "Check the source and the specific threat intelligence setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About Threat Intelligence",
+      "body": "Use the available threat intelligence protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "threat-intelligence",
+    "cybersecurity",
+    "before-you-do-this",
+    "explainer"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-05-19T00:00:00.000Z",
+  "modified": "2026-05-19T00:00:00.000Z"
+}

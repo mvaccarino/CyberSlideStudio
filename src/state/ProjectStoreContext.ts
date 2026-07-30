@@ -11,8 +11,19 @@ export type SlideContentPatch = Partial<
     | "layout"
     | "theme"
     | "captionSafeZonePercent"
+    | "background"
     | "status"
     | "validation"
+    | "layoutTemplateId"
+    | "compositionPlan"
+    | "compositionValidation"
+    | "layoutWarnings"
+    | "compositionFingerprint"
+    | "workingImageFingerprint"
+    | "approvedImageFingerprint"
+    | "lastImagePrompt"
+    | "editorial"
+    | "headlineLineBreaks"
   >
 >;
 

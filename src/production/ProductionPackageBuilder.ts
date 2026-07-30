@@ -232,7 +232,13 @@ Bitrate: 12–20 Mbps
 Audio: AAC, 48 kHz, 320 kbps
 `;
 
-  const music = `MUSIC RECOMMENDATIONS
+  const music = input.music?.displayTitle ? `SELECTED MUSIC
+
+Track: ${input.music.displayTitle}
+Category: ${input.music.category}
+Reason: ${input.music.selectionReason}
+Gain: ${input.music.gain}
+Ducking: ${input.music.duckingEnabled ? "Enabled" : "Disabled"}` : `MUSIC RECOMMENDATIONS
 
 PRIMARY DIRECTION
 Genre: Cinematic technology
@@ -335,11 +341,19 @@ PACKAGE CONTENTS
       relativePath: `Slides/${String(slide.number).padStart(2, "0")}.png`,
       dataUrl: slide.imageDataUrl as string,
     }));
+  const attachments: ProductionPackagePayload["attachments"] = [];
+  if (input.music?.finalMixPath) attachments.push({ relativePath: "Audio/FinalMix.wav", sourcePath: input.music.finalMixPath });
+  if (input.subtitles?.captionsJsonPath) attachments.push({ relativePath: "Captions/captions.json", sourcePath: input.subtitles.captionsJsonPath });
+  if (input.subtitles?.srtPath) attachments.push({ relativePath: "Captions/captions.srt", sourcePath: input.subtitles.srtPath });
+  if (input.subtitles?.assPath) attachments.push({ relativePath: "Captions/captions.ass", sourcePath: input.subtitles.assPath });
+  if (input.slideTextOverlay?.generatedPath) attachments.push({ relativePath: "Captions/slide-overlay.ass", sourcePath: input.slideTextOverlay.generatedPath });
+  files.push({ relativePath: "Captions/Text-Subtitle-Settings.json", contents: JSON.stringify({ slideTextOverlay: input.slideTextOverlay, subtitles: input.subtitles }, null, 2) });
 
   return {
     projectName: slug(input.projectName),
     files,
     images,
+    attachments,
     pdfs: [
       {
         relativePath: "CapCut/CapCut-Editing-Blueprint.pdf",

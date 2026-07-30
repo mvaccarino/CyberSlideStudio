@@ -1,4 +1,7 @@
-const API_URL = "https://api.openai.com/v1/images/generations";
+﻿const API_URL = "https://api.openai.com/v1/images/generations";
+const {
+  composePosterPrompt,
+} = require("./composition/compositionDirector.cjs");
 
 function assertString(value, name) {
   if (typeof value !== "string" || !value.trim()) {
@@ -11,7 +14,8 @@ async function requestJson(url, options) {
   const body = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    const message = body?.error?.message || `OpenAI request failed (${response.status}).`;
+    const message =
+      body?.error?.message || `OpenAI request failed (${response.status}).`;
     const error = new Error(message);
     error.status = response.status;
     error.requestId = response.headers.get("x-request-id") || undefined;
@@ -28,19 +32,28 @@ async function testConnection(apiKey) {
   });
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body?.error?.message || `OpenAI connection failed (${response.status}).`);
+    throw new Error(
+      body?.error?.message || `OpenAI connection failed (${response.status}).`,
+    );
   }
   return { connected: true, model: "gpt-image-2" };
 }
 
-async function generatePosters({ apiKey, prompt, count = 1, quality = "high", size = "1088x1920" }) {
+async function generatePosters({
+  apiKey,
+  prompt,
+  count = 1,
+  quality = "high",
+  size = "1088x1920",
+  subtitleSafeArea = 25,
+}) {
   assertString(apiKey, "OpenAI API key");
   assertString(prompt, "Poster prompt");
 
   const safeCount = Math.max(1, Math.min(4, Number(count) || 1));
   const payload = {
     model: "gpt-image-2",
-    prompt,
+    prompt: composePosterPrompt(prompt, subtitleSafeArea),
     n: safeCount,
     size,
     quality,
@@ -62,8 +75,12 @@ async function generatePosters({ apiKey, prompt, count = 1, quality = "high", si
   if (!images.length) throw new Error("OpenAI returned no poster images.");
 
   return images.map((item, index) => {
-    if (!item?.b64_json) throw new Error(`Poster ${index + 1} contained no image data.`);
-    return { base64: item.b64_json, revisedPrompt: item.revised_prompt || null };
+    if (!item?.b64_json)
+      throw new Error(`Poster ${index + 1} contained no image data.`);
+    return {
+      base64: item.b64_json,
+      revisedPrompt: item.revised_prompt || null,
+    };
   });
 }
 

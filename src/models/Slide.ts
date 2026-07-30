@@ -1,9 +1,9 @@
+import type { SlideEditorialLayout } from "../editorial/types";
+import type { CompositionPlan, CompositionValidationResult } from "../editorial/CompositionPlan";
+import type { LayoutTemplateId } from "../editorial/LayoutTemplates";
+
 export type SlideStatus =
-  | "draft"
-  | "ready"
-  | "generating"
-  | "generated"
-  | "error";
+  "draft" | "ready" | "generating" | "generated" | "error";
 
 export type SlideLayout =
   | "cinematic-hero"
@@ -34,6 +34,11 @@ export type SlideBackground = {
   imagePath: string | null;
   provider: "flux" | "local" | "none";
   generationId: string | null;
+  promptOverride?: string;
+  workingImagePath?: string | null;
+  approvedImagePath?: string | null;
+  approvedAt?: string | null;
+  approvalLocked?: boolean;
 };
 
 export type SlideTypography = {
@@ -55,6 +60,17 @@ export type Slide = {
   theme: SlideTheme;
   background: SlideBackground;
   typography: SlideTypography;
+  editorial: SlideEditorialLayout | null;
+  layoutTemplateId: LayoutTemplateId;
+  compositionPlan: CompositionPlan | null;
+  headlineLineBreaks: string[];
+  textStyleOverrides: Record<string, string | number | boolean>;
+  compositionValidation: CompositionValidationResult | null;
+  layoutWarnings: string[];
+  compositionFingerprint: string | null;
+  workingImageFingerprint: string | null;
+  approvedImageFingerprint: string | null;
+  lastImagePrompt: string;
   captionSafeZonePercent: number;
   status: SlideStatus;
   validation: SlideValidationIssue[];

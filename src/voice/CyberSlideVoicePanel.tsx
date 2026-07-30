@@ -7,9 +7,9 @@ import type {
   VoiceGenerationResult,
 } from "./types";
 
-type Props = { projectName: string; slides: Slide[] };
+type Props = { projectName: string; slides: Slide[]; onGenerated?: (result: VoiceGenerationResult) => void };
 
-export function CyberSlideVoicePanel({ projectName, slides }: Props) {
+export function CyberSlideVoicePanel({ projectName, slides, onGenerated }: Props) {
   const [voices, setVoices] = useState<CyberSlideVoice[]>([]);
   const [voiceId, setVoiceId] = useState("am_adam");
   const [speed, setSpeed] = useState(1);
@@ -17,7 +17,7 @@ export function CyberSlideVoicePanel({ projectName, slides }: Props) {
   const [paddingAfter, setPaddingAfter] = useState(0.28);
   const [engine, setEngine] = useState<CyberSlideVoiceStatus | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "generating" | "complete" | "error">("loading");
-  const [message, setMessage] = useState("Loading CyberSlide Voice Pro…");
+  const [message, setMessage] = useState("Loading CyberSlide Voice Proâ€¦");
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<VoiceGenerationResult | null>(null);
 
@@ -52,7 +52,7 @@ export function CyberSlideVoicePanel({ projectName, slides }: Props) {
     try {
       setStatus("loading");
       setProgress(0);
-      setMessage("Preparing the local neural voice model…");
+      setMessage("Preparing the local neural voice modelâ€¦");
       const result = await window.cyberSlideStudio.prepareCyberSlideVoice();
       setEngine(result);
       setStatus("ready");
@@ -68,7 +68,7 @@ export function CyberSlideVoicePanel({ projectName, slides }: Props) {
     try {
       setStatus("loading");
       setProgress(0);
-      setMessage("Generating a professional voice preview…");
+      setMessage("Generating a professional voice previewâ€¦");
       await window.cyberSlideStudio.previewCyberSlideVoice({
         projectName,
         voiceId,
@@ -87,7 +87,7 @@ export function CyberSlideVoicePanel({ projectName, slides }: Props) {
     try {
       setStatus("generating");
       setProgress(0);
-      setMessage(`Generating professional narration for ${slides.length} slides…`);
+      setMessage(`Generating professional narration for ${slides.length} slidesâ€¦`);
       const generated = await window.cyberSlideStudio.generateCyberSlideVoice({
         projectName,
         voiceId,
@@ -97,9 +97,10 @@ export function CyberSlideVoicePanel({ projectName, slides }: Props) {
         slides,
       });
       setResult(generated);
+      onGenerated?.(generated);
       setStatus("complete");
       setProgress(100);
-      setMessage(`Professional narration complete · ${generated.totalDurationSeconds.toFixed(1)} seconds.`);
+      setMessage(`Professional narration complete Â· ${generated.totalDurationSeconds.toFixed(1)} seconds.`);
     } catch (error) {
       setStatus("error");
       setMessage(error instanceof Error ? error.message : "Narration generation failed.");
@@ -116,16 +117,16 @@ export function CyberSlideVoicePanel({ projectName, slides }: Props) {
         <span>LOCAL</span><span>NO SUBSCRIPTION</span><span>{engine?.engine || "Kokoro Neural TTS"}</span>
       </div>
 
-      <label className="voice-field"><span>Voice Style</span><select value={voiceId} onChange={(event) => setVoiceId(event.target.value)} disabled={!voices.length || status === "generating"}>{voices.map((voice) => <option key={voice.id} value={voice.id}>{voice.name} · {voice.gender} · {voice.accent}</option>)}</select></label>
+      <label className="voice-field"><span>Voice Style</span><select value={voiceId} onChange={(event) => setVoiceId(event.target.value)} disabled={!voices.length || status === "generating"}>{voices.map((voice) => <option key={voice.id} value={voice.id}>{voice.name} Â· {voice.gender} Â· {voice.accent}</option>)}</select></label>
       {selectedVoice && <div className="voice-description"><strong>{selectedVoice.name}</strong><span>{selectedVoice.description}</span></div>}
 
-      <label className="voice-field"><span>Delivery Speed <strong>{speed.toFixed(2)}×</strong></span><input type="range" min="0.80" max="1.20" step="0.02" value={speed} onChange={(event) => setSpeed(Number(event.target.value))} /></label>
+      <label className="voice-field"><span>Delivery Speed <strong>{speed.toFixed(2)}Ã—</strong></span><input type="range" min="0.80" max="1.20" step="0.02" value={speed} onChange={(event) => setSpeed(Number(event.target.value))} /></label>
       <div className="voice-grid"><label className="voice-field"><span>Lead-in</span><input type="number" min="0" max="2" step="0.01" value={paddingBefore} onChange={(event) => setPaddingBefore(Number(event.target.value))} /></label><label className="voice-field"><span>Tail padding</span><input type="number" min="0" max="2" step="0.01" value={paddingAfter} onChange={(event) => setPaddingAfter(Number(event.target.value))} /></label></div>
 
       <div className="voice-summary"><span>{slides.length} scenes</span><span>{estimatedWords} words</span><span>{result ? `${result.totalDurationSeconds.toFixed(1)} sec` : "Timing pending"}</span></div>
       {!engine?.modelReady && <button className="secondary-button voice-action" type="button" onClick={() => void prepare()} disabled={status === "generating" || status === "loading"}>Download Voice Model</button>}
       <button className="secondary-button voice-action" type="button" onClick={() => void previewVoice()} disabled={!voiceId || status === "generating"}>Preview Voice</button>
-      <button className="primary-button voice-action" type="button" onClick={() => void generate()} disabled={!voiceId || !slides.length || status === "generating"}>{status === "generating" ? "Generating Professional Voice…" : "Generate Voiceover & Timing"}</button>
+      <button className="primary-button voice-action" type="button" onClick={() => void generate()} disabled={!voiceId || !slides.length || status === "generating"}>{status === "generating" ? "Generating Professional Voiceâ€¦" : "Generate Voiceover & Timing"}</button>
       <button className="ghost-button voice-action" type="button" onClick={() => void window.cyberSlideStudio.openVoiceoverFolder(projectName)}>Open Voiceover Folder</button>
 
       {(status === "loading" || status === "generating") && <div className="voice-progress"><div style={{ width: `${Math.max(2, progress)}%` }} /></div>}

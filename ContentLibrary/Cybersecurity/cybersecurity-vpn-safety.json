@@ -1,0 +1,70 @@
+{
+  "id": "cybersecurity-vpn-safety",
+  "title": "VPN Safety",
+  "category": "Cybersecurity",
+  "description": "A explainer short-form VPN Safety explanation for consumers, using a realistic example and specific next steps.",
+  "difficulty": "Beginner",
+  "audience": "Consumers",
+  "estimatedSeconds": 44,
+  "productionStyle": "Corporate",
+  "cameraStyle": "purposeful documentary push",
+  "captionStyle": "high-contrast spoken captions",
+  "musicStyle": "Technology",
+  "voiceStyle": "conversational and clear",
+  "effectsStyle": "topic-led focus highlights with restrained depth",
+  "thumbnailTitle": "BEFORE YOU USE VPN SAFETY, STOP FOR THIS TEN-SECOND CHECK",
+  "youtubeTitle": "Before you use vpn safety, stop for this ten-second check | VPN Safety Explained",
+  "youtubeDescription": "A plain-language VPN Safety example, what it means, and the specific steps that reduce the risk.",
+  "tiktokCaption": "Before you use vpn safety, stop for this ten-second check. Here is the safer move.",
+  "instagramCaption": "VPN Safety makes more sense through a real example. Save these steps.",
+  "hashtags": [
+    "#vpnsafety",
+    "#cybersecurity",
+    "#OnlineSafety"
+  ],
+  "posterPrompt": "Vertical 9:16 cinematic photograph of a phone owner dealing with vpn safety in a realistic everyday environment; clear subject, realistic environment, natural dramatic lighting, room for an upper-third headline; no logos, readable UI text, watermarks, hacker silhouettes, or split panels.",
+  "hook": "Before you use vpn safety, stop for this ten-second check.",
+  "voiceScript": "Before you use vpn safety, stop for this ten-second check. VPN Safety means the real-world choices, risks, and protections involved in vpn safety. Picture this: a phone owner encounters vpn safety during a normal day and must decide whether to trust a request, setting, or device. Here is why that matters: a rushed vpn safety choice can expose information, interrupt access, or give the wrong person an opening. Check the source and the specific vpn safety setting before continuing. Use the available vpn safety protection and ask a trusted person or IT support when its details do not make sense. Click the Follow button to see new cybersecurity tips every day.",
+  "slides": [
+    {
+      "title": "Use VPN Safety Safely",
+      "body": "A rushed vpn safety choice can expose information, interrupt access, or give the wrong person an opening.",
+      "cta": ""
+    },
+    {
+      "title": "VPN Safety, In Plain English",
+      "body": "VPN Safety means the real-world choices, risks, and protections involved in vpn safety.",
+      "cta": ""
+    },
+    {
+      "title": "A Real VPN Safety Moment",
+      "body": "a phone owner encounters vpn safety during a normal day and must decide whether to trust a request, setting, or device",
+      "cta": ""
+    },
+    {
+      "title": "The VPN Safety Consequence",
+      "body": "a rushed vpn safety choice can expose information, interrupt access, or give the wrong person an opening",
+      "cta": ""
+    },
+    {
+      "title": "Use VPN Safety More Safely",
+      "body": "Check the source and the specific vpn safety setting before continuing.",
+      "cta": ""
+    },
+    {
+      "title": "Remember This About VPN Safety",
+      "body": "Use the available vpn safety protection and ask a trusted person or IT support when its details do not make sense.",
+      "cta": "Click the Follow button to see new cybersecurity tips every day."
+    }
+  ],
+  "tags": [
+    "vpn-safety",
+    "cybersecurity",
+    "before-you-do-this",
+    "explainer"
+  ],
+  "version": "2.0.0",
+  "author": "CyberSlide Viral Content Director",
+  "created": "2026-04-28T00:00:00.000Z",
+  "modified": "2026-04-28T00:00:00.000Z"
+}

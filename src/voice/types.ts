@@ -40,6 +40,8 @@ export type VoiceTimingScene = {
 export type VoiceGenerationResult = {
   folderPath: string;
   timingPath: string;
+  narrationPath: string;
+  generatedAt: string;
   totalDurationSeconds: number;
   scenes: VoiceTimingScene[];
 };

@@ -1,70 +1,7 @@
-import type {
-  NativeVideoPlan,
-  VideoMotionPreset,
-  VideoScene,
-  VideoTransitionPreset,
-} from "./types";
-
-const MOTIONS: readonly VideoMotionPreset[] = [
-  "slow-zoom-in",
-  "pan-right",
-  "slow-zoom-out",
-  "pan-left",
-];
-
-const TRANSITIONS: readonly VideoTransitionPreset[] = [
-  "fade",
-  "slide-left",
-  "wipe-left",
-  "slide-right",
-];
-
-function clamp(value: number, minimum: number, maximum: number): number {
-  return Math.max(minimum, Math.min(maximum, value));
-}
-
-function estimateDuration(text: string): number {
-  const words = text.trim().split(/\s+/).filter(Boolean).length;
-  return clamp(words / 2.5 + 0.65, 3.2, 8);
-}
-
-export function buildNativeVideoPlan(input: {
-  projectName: string;
-  slides: Array<{
-    number: number;
-    imagePath?: string;
-    title: string;
-    body: string;
-  }>;
-  voiceoverPath?: string;
-}): NativeVideoPlan {
-  const scenes: VideoScene[] = input.slides
-    .filter(
-      (slide): slide is typeof slide & { imagePath: string } =>
-        Boolean(slide.imagePath),
-    )
-    .map((slide, index) => ({
-      slideNumber: slide.number,
-      imagePath: slide.imagePath,
-      durationSeconds: estimateDuration(
-        [slide.title, slide.body].filter(Boolean).join(" "),
-      ),
-      motion: MOTIONS[index % MOTIONS.length],
-      transition: TRANSITIONS[index % TRANSITIONS.length],
-      transitionSeconds: 0.3,
-    }));
-
-  if (scenes.length === 0) {
-    throw new Error("Generate or finalize at least one slide before rendering.");
-  }
-
-  return {
-    projectName: input.projectName,
-    width: 1080,
-    height: 1920,
-    fps: 30,
-    scenes,
-    voiceoverPath: input.voiceoverPath,
-    outputFileName: `${input.projectName}-Final-Video.mp4`,
-  };
-}
+import type { NativeVideoPlan,VideoScene } from "./types";
+import type { ApprovedAsset,ProductionStyleName } from "../aiDirector/types";
+import { directMotions,directTransitions } from "../aiDirector/MotionDirector";
+const clamp=(v:number,min:number,max:number)=>Math.max(min,Math.min(max,v));
+export function buildNativeVideoPlan(input:{projectName:string;slides:Array<{id?:string;number:number;approvedImagePath?:string|null;title:string;body:string}>;approvedAssetManifest?:ApprovedAsset[];productionStyleName?:ProductionStyleName;voiceScenes?:Array<{slideNumber:number;sceneDurationSeconds:number}>;narrationPath?:string|null;finalMixPath?:string|null;overlayPath?:string|null;subtitlePath?:string|null;layoutFingerprint?:string;renderMode?:"preview"|"final"}):NativeVideoPlan{
+ const style=input.productionStyleName||"Cybersecurity Professional";const timing=new Map((input.voiceScenes||[]).map(s=>[s.slideNumber,s.sceneDurationSeconds]));const approved=input.slides.filter(s=>Boolean(s.approvedImagePath));const existing=new Map((input.approvedAssetManifest||[]).map(a=>[a.slideNumber,a]));const directed=directMotions(approved.map(s=>({slideId:s.id||String(s.number),slideNumber:s.number,path:s.approvedImagePath as string,title:s.title,body:s.body})),style);const transitions=directTransitions(approved.length,style);
+ const scenes:VideoScene[]=approved.map((slide,index)=>{const asset=existing.get(slide.number)||directed[index];return {slideNumber:slide.number,imagePath:slide.approvedImagePath as string,durationSeconds:clamp(timing.get(slide.number)??(([slide.title,slide.body].join(" ").trim().split(/\s+/).filter(Boolean).length/2.5)+.65),1.5,30)+(index?(style==="Netflix Documentary"?.65:style==="Fast Social"||style==="Viral Short"?.2:.3):0),motion:(asset.motion||directed[index].motion||"slow-zoom-in") as VideoScene["motion"],transition:transitions[index],transitionSeconds:style==="Netflix Documentary"?.65:style==="Fast Social"||style==="Viral Short"?.2:.3};});if(!scenes.length)throw new Error("Approve at least one slide before rendering.");const stamp=new Date().toISOString().replace(/[:.]/g,"-");return {projectName:input.projectName,layoutFingerprint:input.layoutFingerprint,width:1080,height:1920,fps:30,scenes,narrationPath:input.narrationPath||undefined,finalMixPath:input.finalMixPath||undefined,overlayPath:input.overlayPath||undefined,subtitlePath:input.subtitlePath||undefined,renderMode:input.renderMode||"final",outputFileName:`${input.projectName}-${input.renderMode||"final"}-${stamp}.mp4`};}
