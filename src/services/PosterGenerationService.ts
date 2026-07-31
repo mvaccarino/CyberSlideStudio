@@ -25,6 +25,7 @@ export async function generatePoster(input: {
   subtitleSafeArea?: SubtitleSafeArea;
   compositionPlan: CompositionPlan;
   layoutFingerprint: string;
+  requestId?: string;
 }): Promise<GeneratedPoster> {
   const safeArea = input.subtitleSafeArea ?? 25;
   let rejection = "";
@@ -34,6 +35,7 @@ export async function generatePoster(input: {
   for (let attempt = 1; attempt <= MAX_COMPOSITION_ATTEMPTS; attempt += 1) {
     lastPrompt = `${input.prompt}\n\n${compositionPrompt(input.compositionPlan, attempt === 2)}${rejection ? `\n\nPrevious composition validation failed: ${rejection}` : ""}`;
     if (typeof window !== "undefined" && window.location.hostname === "localhost") console.info("[LayoutFirst] OpenAI poster prompt", { slideNumber: input.slideNumber, layoutTemplateId: input.compositionPlan.layoutTemplateId, layoutFingerprint: input.layoutFingerprint, prompt: lastPrompt });
+    if (typeof window !== "undefined" && window.location.hostname === "localhost") console.info("[ProjectUpdate] API request start", { requestId:input.requestId,slideNumber:input.slideNumber,attempt });
     const result = await window.cyberSlideStudio.generateOpenAIPosters({
       prompt: lastPrompt,
       slideNumber: input.slideNumber,
@@ -41,7 +43,9 @@ export async function generatePoster(input: {
       count: 1,
       quality: input.quality ?? "low",
       subtitleSafeArea: safeArea,
+      requestId: input.requestId,
     });
+    if (typeof window !== "undefined" && window.location.hostname === "localhost") console.info("[ProjectUpdate] API response received", { requestId:input.requestId,slideNumber:input.slideNumber,attempt });
     const poster = result.posters[0];
     if (!poster) throw new Error("The AI provider returned no poster.");
     lastPoster = poster;

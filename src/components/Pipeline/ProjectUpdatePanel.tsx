@@ -1,37 +1,37 @@
+import { useEffect, useState } from "react";
 import type { Project } from "../../models/Project";
-import { deriveLayoutStaleness } from "../../editorial/LayoutFreshness";
+import { deriveLayoutStaleness, slideLayoutFingerprint } from "../../editorial/LayoutFreshness";
+import { listLayoutTemplates, type LayoutTemplateId } from "../../editorial/LayoutTemplates";
+import type { EditorialPosterStyle } from "../../editorial/types";
+import type { SubtitleSafeArea } from "../../composition/CompositionDirector";
+import type { UpdateQueueSnapshot } from "./ProjectUpdateWorkflow";
 
-type Props = {
-  project: Project;
-  busy: boolean;
-  onUpdate: () => Promise<void>;
-};
-
-export function ProjectUpdatePanel({ project, busy, onUpdate }: Props) {
-  const stale = deriveLayoutStaleness(project);
-  const scriptOrLayoutStale = stale.staleSlideIds.some((id) => {
-    const slide = project.slides.find((item) => item.id === id);
-    return Boolean(slide && slide.compositionFingerprint !== slide.approvedImageFingerprint);
-  });
-  const items = [
-    scriptOrLayoutStale && "Script or layout inputs changed",
-    stale.imageStale && `${stale.staleSlideIds.length} image${stale.staleSlideIds.length === 1 ? "" : "s"} need layout updates`,
-    stale.textStale && "Editorial and caption assets need rebuilding",
-    stale.videoStale && "Final video needs rendering",
-  ].filter(Boolean) as string[];
-
-  if (!items.length) return null;
-  return (
-    <section className="project-update-panel" aria-label="Project update required">
-      <div>
-        <p className="eyebrow">PROJECT UPDATE</p>
-        <h2>Production assets are out of date</h2>
-        <ul>{items.map((item) => <li key={item}>{item}</li>)}</ul>
-        <p>Approved images stay in place until you approve their replacements. Voice and music are preserved.</p>
+export type UpdateScope="current"|"all";
+export type UpdateSettings={layoutTemplateId:LayoutTemplateId;safeArea:SubtitleSafeArea;headlineStyle:EditorialPosterStyle;highlightColor:string;scope:UpdateScope;timeoutSeconds:number;concurrency:1|2};
+type Props={project:Project;selectedSlideId:string|null;progress:UpdateQueueSnapshot;onApply:(settings:UpdateSettings)=>void;onPreview:()=>void;onUpdate:(settings:UpdateSettings,onlyFailed?:boolean)=>Promise<unknown>;onCancel:()=>void};
+const formatTime=(seconds:number)=>`${String(Math.floor(seconds/60)).padStart(2,"0")}:${String(seconds%60).padStart(2,"0")}`;
+export function ProjectUpdatePanel({project,selectedSlideId,progress,onApply,onPreview,onUpdate,onCancel}:Props){
+  const selected=project.slides.find(slide=>slide.id===selectedSlideId)||project.slides[0],stale=deriveLayoutStaleness(project);
+  const [layoutTemplateId,setLayout]=useState<LayoutTemplateId>(selected?.layoutTemplateId||"editorial-left"),[safeArea,setSafeArea]=useState<SubtitleSafeArea>(project.settings.captionSafeZonePercent as SubtitleSafeArea),[headlineStyle,setHeadlineStyle]=useState<EditorialPosterStyle>(project.slideTextOverlay.posterStyle),[highlightColor,setHighlightColor]=useState(project.slideTextOverlay.highlightColor),[scope,setScope]=useState<UpdateScope>("all"),[timeoutSeconds,setTimeoutSeconds]=useState(180),[concurrency,setConcurrency]=useState<1|2>(1),[now,setNow]=useState(0);
+  useEffect(()=>{if(!progress.running)return;const id=window.setInterval(()=>setNow(Date.now()),1000);return()=>window.clearInterval(id)},[progress.running]);
+  const settings={layoutTemplateId,safeArea,headlineStyle,highlightColor,scope,timeoutSeconds,concurrency},apply=(patch:Partial<UpdateSettings>)=>{const next={...settings,...patch};onApply(next)},items=progress.items,completed=items.filter(item=>item.status==="completed").length,failed=items.filter(item=>item.status==="failed").length,finished=completed+failed+items.filter(item=>item.status==="cancelled").length,total=items.length,elapsed=progress.startedAt&&now?Math.max(0,Math.floor((now-progress.startedAt)/1000)):0,average=completed?elapsed/completed:0,remaining=completed&&total>finished?Math.round(average*(total-finished)/concurrency):null,percent=total?Math.round(finished/total*100):0,hasFailed=failed>0;
+  if(!stale.imageStale&&!stale.textStale&&!stale.videoStale&&!progress.running&&!items.length)return null;
+  return <section className="project-update-panel" aria-label="Project update required">
+    <div className="project-update-main"><p className="eyebrow">PROJECT UPDATE</p><h2>{progress.running?"Updating Project":"Production assets are out of date"}</h2>
+      <div className="project-update-controls">
+        <label>Layout Template<select aria-label="Layout Template" value={layoutTemplateId} disabled={progress.running} onChange={event=>{const value=event.target.value as LayoutTemplateId;setLayout(value);apply({layoutTemplateId:value})}}>{listLayoutTemplates().map(template=><option key={template.id} value={template.id}>{template.name}</option>)}</select></label>
+        <label>Subtitle Safe Area<select value={safeArea} disabled={progress.running} onChange={event=>{const value=Number(event.target.value) as SubtitleSafeArea;setSafeArea(value);apply({safeArea:value})}}><option value={20}>20%</option><option value={25}>25%</option><option value={30}>30%</option></select></label>
+        <label>Headline Style<select value={headlineStyle} disabled={progress.running} onChange={event=>{const value=event.target.value as EditorialPosterStyle;setHeadlineStyle(value);apply({headlineStyle:value})}}>{["Editorial Bold","Documentary","Corporate","Educational","Fast Social","Viral Alert","News Report","Minimal"].map(value=><option key={value}>{value}</option>)}</select></label>
+        <label>Highlight Color<input type="color" value={highlightColor} disabled={progress.running} onChange={event=>{setHighlightColor(event.target.value);apply({highlightColor:event.target.value})}} /></label>
+        <label>Apply Layout to<select value={scope} disabled={progress.running} onChange={event=>setScope(event.target.value as UpdateScope)}><option value="current">Current Slide</option><option value="all">All Slides</option></select></label>
+        <label>Request Timeout<input type="number" min={30} max={600} value={timeoutSeconds} disabled={progress.running} onChange={event=>setTimeoutSeconds(Math.max(30,Number(event.target.value)||180))}/></label>
+        <label>Concurrency<select value={concurrency} disabled={progress.running} onChange={event=>setConcurrency(Number(event.target.value) as 1|2)}><option value={1}>1 request</option><option value={2}>2 requests</option></select></label>
       </div>
-      <button className="primary-button" type="button" disabled={busy} onClick={() => void onUpdate()}>
-        {busy ? "Updating..." : "Update Project"}
-      </button>
-    </section>
-  );
+      <button className="secondary-button" type="button" disabled={progress.running} onClick={onPreview}>Preview Layout</button>
+      {progress.running&&<div className="update-progress"><strong>Step {Math.min(finished+1,total)} of {total}</strong><span>{progress.stage}{progress.currentSlide?` for Slide ${progress.currentSlide}`:""}</span><progress max={100} value={percent}/><div><span>{completed} / {total} images</span><span>Failed: {failed}</span><span>Elapsed: {formatTime(elapsed)}</span><span>Remaining: {remaining===null?"Estimating...":formatTime(remaining)}</span></div></div>}
+      {items.some(item=>item.error)&&<ul className="update-errors">{items.filter(item=>item.error).map(item=><li key={item.slideId}>Slide {item.slideNumber}: {item.error}</li>)}</ul>}
+      <div className="project-update-actions"><button className="primary-button" type="button" disabled={progress.running||!selected} onClick={()=>void onUpdate({...settings,scope:"all"})}>Update All Stale Slides</button><button className="secondary-button" type="button" disabled={progress.running||!selected} onClick={()=>void onUpdate({...settings,scope:"current"})}>Update Current Slide</button>{progress.running&&<button className="danger-button" type="button" onClick={onCancel}>Cancel Update</button>}{hasFailed&&<><button className="secondary-button" type="button" onClick={()=>void onUpdate(settings,true)}>Retry Failed Slides</button><button className="secondary-button" type="button" onClick={()=>void onUpdate({...settings,scope:"current"})}>Retry Current Slide</button></>}</div>
+      {import.meta.env.DEV&&<details className="update-details"><summary>Update Details</summary><p>Selected layout: {layoutTemplateId}</p><p>Current fingerprint: {selected?.approvedImageFingerprint||"none"}</p><p>Target fingerprint: {selected?slideLayoutFingerprint(selected):"none"}</p><p>Stale reason: {stale.imageStale?"image/layout":stale.textStale?"editorial assets":"video"}</p><pre>{JSON.stringify(items,null,2)}</pre></details>}
+    </div>
+  </section>
 }

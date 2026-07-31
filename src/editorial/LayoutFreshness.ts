@@ -16,12 +16,12 @@ export const fingerprint=(value:unknown):string=>{
 };
 const semanticPlan=(slide:Slide)=>slide.compositionPlan?{...slide.compositionPlan,createdAt:undefined,sourceFingerprint:undefined}:null;
 export function slideLayoutFingerprint(slide:Slide):string{
-  return fingerprint({layoutEngineVersion:LAYOUT_ENGINE_VERSION,layoutTemplateId:slide.layoutTemplateId,compositionPlan:semanticPlan(slide),headline:slide.editorial?.displayHeadline||slide.title,emphasizedPhrase:slide.editorial?.emphasizedText||"",supportText:slide.editorial?.supportingLine||slide.body,safeAreaPercent:slide.captionSafeZonePercent,imagePromptCompositionInstructions:slide.compositionPlan?compositionPrompt(slide.compositionPlan):""});
+  return fingerprint({layoutEngineVersion:LAYOUT_ENGINE_VERSION,layoutTemplateId:slide.layoutTemplateId,compositionPlan:semanticPlan(slide),headline:slide.editorialPackage.displayHeadline,emphasizedPhrase:slide.editorialPackage.highlightPhrase,supportText:slide.editorialPackage.supportLine,safeAreaPercent:slide.captionSafeZonePercent,imagePromptCompositionInstructions:slide.compositionPlan?compositionPrompt(slide.compositionPlan):""});
 }
 export function voiceInputFingerprint(project: Project): string {
   return fingerprint({
     cta: resolveProjectCTA(project),
-    slides: project.slides.map(({ number, title, body, cta }) => ({ number, title, body, cta })),
+    slides: project.slides.map(({ number, editorialPackage }) => ({ number, narration: editorialPackage.narration })),
   });
 }
 export function projectLayoutFingerprint(project:Pick<Project,"slides"|"settings">):string{

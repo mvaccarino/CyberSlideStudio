@@ -1,4 +1,4 @@
-﻿const API_URL = "https://api.openai.com/v1/images/generations";
+const API_URL = "https://api.openai.com/v1/images/generations";
 const {
   composePosterPrompt,
 } = require("./composition/compositionDirector.cjs");
@@ -46,6 +46,7 @@ async function generatePosters({
   quality = "high",
   size = "1088x1920",
   subtitleSafeArea = 25,
+  signal,
 }) {
   assertString(apiKey, "OpenAI API key");
   assertString(prompt, "Poster prompt");
@@ -69,6 +70,7 @@ async function generatePosters({
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
+    signal,
   });
 
   const images = Array.isArray(body.data) ? body.data : [];

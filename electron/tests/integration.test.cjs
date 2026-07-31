@@ -205,11 +205,11 @@ const editorialCjs=require("../captions/editorialEngine.cjs");
 const editorialDirector=loadTypeScript("src/editorial/EditorialDirector.ts");
 const layoutDirector=loadTypeScript("src/editorial/EditorialLayoutDirector.ts");
 const editorialSlides=[{number:1,title:"Your Antivirus Isn't Enough",body:"One infected laptop can expose files, passwords, and the rest of your business network.",cta:"",editorial:{displayHeadline:"YOUR ANTIVIRUS ISN'T ENOUGH",emphasizedText:"ISN'T ENOUGH",supportingLine:"Endpoint protection watches every work device for suspicious behavior.",layoutAlignment:"left",posterTextRegion:"upper-left",manualOverride:false,validationWarnings:[]}}];
-test("editorial layout is generated for every slide with exactly one in-headline emphasis",()=>{const slides=[{id:"1",number:1,title:"Your Antivirus Isn't Enough",body:"One infected laptop can expose the network.",cta:"",editorial:null},{id:"2",number:2,title:"Protect Every Device",body:"Install endpoint protection on every work computer.",cta:"",editorial:null}];const result=editorialDirector.generateEditorialLayouts(slides,[],"Follow for more tips.");assert.equal(result.length,2);for(const slide of result){assert.ok(slide.editorial);assert.ok(slide.editorial.displayHeadline.includes(slide.editorial.emphasizedText));assert.ok(slide.editorial.emphasizedText.split(/\s+/).length<=3);}});
+test("editorial layout is generated for every slide with exactly one in-headline emphasis",()=>{const slides=[{id:"1",number:1,title:"Your Antivirus Isn't Enough",body:"One infected laptop can expose the network.",cta:"",editorial:null},{id:"2",number:2,title:"Protect Every Device",body:"Install endpoint protection on every work computer.",cta:"",editorial:null}];const result=editorialDirector.generateEditorialLayouts(slides,[],"Follow for more tips.");assert.equal(result.length,2);for(const slide of result){assert.ok(slide.editorial);assert.ok(slide.editorial.displayHeadline.replace(/\n/g," ").includes(slide.editorial.emphasizedText));assert.ok(slide.editorial.emphasizedText.split(/\s+/).length<=3);}});
 test("headline and support are distinct and the full body is never rendered",()=>{const ass=captions.buildOverlayAss(editorialSlides,captionScenes,{...captions.DEFAULT_OVERLAY,enabled:true,posterStyle:"CyberSlide Bold",posterTextMode:"persistent"});assert.match(ass,/Style: Editorial/);assert.match(ass,/Style: Support/);assert.match(ass,/\\pos\(70,150\)/);assert.doesNotMatch(ass,/One infected laptop can expose files, passwords, and the rest of your business network/);assert.deepEqual(editorialDirector.validateEditorial(editorialSlides[0].editorial,editorialSlides[0].body),[]);});
 test("captions source narration only and start when narration begins",()=>{const events=captions.buildCaptionEvents(captionScenes,4);assert.ok(events.every(event=>event.source==="narration"));assert.equal(events[0].startSeconds,captionScenes[0].sceneStartSeconds+captionScenes[0].paddingBeforeSeconds);assert.equal(events.map(event=>event.text).join(" "),captionScenes[0].text);});
 test("caption grouping remains three to six words and two lines",()=>{const events=captions.buildCaptionEvents(captionScenes,5);assert.ok(events.every(event=>event.words.length>=3&&event.words.length<=6));assert.ok(events.every(event=>event.lines.split("\\N").length<=2));});
-test("final editorial slide supports the selected Brand CTA",()=>{const slides=[{id:"1",number:1,title:"Stop the Attack",body:"Catch suspicious behavior before it spreads.",cta:"Brand CTA",editorial:null}];const result=editorialDirector.generateEditorialLayouts(slides,[],"Click the Follow button to see new cybersecurity tips every day.");assert.equal(result[0].editorial.supportingLine,"Click the Follow button to see new cybersecurity tips every day.");});
+test("final editorial slide supports the selected Brand CTA",()=>{const slides=[{id:"1",number:1,title:"Stop the Attack",body:"Catch suspicious behavior before it spreads.",cta:"Brand CTA",editorial:null}];const result=editorialDirector.generateEditorialLayouts(slides,[],"Click the Follow button to see new cybersecurity tips every day.");assert.equal(result[0].editorial.supportingLine,result[0].editorialPackage.supportLine);});
 test("image-aware layout selects the opposite side and centered fallback",()=>{
   assert.equal(layoutDirector.decideEditorialLayout({analysis:{subjectPosition:"right",visualWeight:"balanced"}}).alignment,"left");
   assert.equal(layoutDirector.decideEditorialLayout({analysis:{subjectPosition:"left",visualWeight:"balanced"}}).alignment,"right");
@@ -676,7 +676,7 @@ test("music-only change does not mark image layout stale",()=>{
 test("versioned fingerprint changes for editorial text safe area and prompt composition",()=>{
   const project=fingerprintReadyProject(),slide=project.slides[0],base=layoutFreshness.slideLayoutFingerprint(slide);
   assert.match(base,new RegExp(`^${layoutFreshness.LAYOUT_ENGINE_VERSION}:`));
-  assert.notEqual(layoutFreshness.slideLayoutFingerprint({...slide,editorial:{...slide.editorial,supportingLine:"A different concrete support line."}}),base);
+  assert.notEqual(layoutFreshness.slideLayoutFingerprint({...slide,editorialPackage:{...slide.editorialPackage,supportLine:"A different concrete support line."}}),base);
   assert.notEqual(layoutFreshness.slideLayoutFingerprint({...slide,captionSafeZonePercent:30}),base);
   const changedPlan={...slide.compositionPlan,negativeSpaceInstruction:"Reserve a much darker left side."};
   assert.notEqual(layoutFreshness.slideLayoutFingerprint({...slide,compositionPlan:changedPlan}),base);
@@ -713,15 +713,69 @@ test("voice freshness changes for script inputs but ignores music-only changes",
   const project=fingerprintReadyProject();
   const current=layoutFreshness.voiceInputFingerprint(project);
   assert.equal(layoutFreshness.voiceInputFingerprint({...project,music:{...project.music,gain:.1}}),current);
-  assert.notEqual(layoutFreshness.voiceInputFingerprint({...project,slides:project.slides.map((slide,index)=>index===0?{...slide,body:`${slide.body} Updated narration detail.`}:slide)}),current);
+  assert.notEqual(layoutFreshness.voiceInputFingerprint({...project,slides:project.slides.map((slide,index)=>index===0?{...slide,editorialPackage:{...slide.editorialPackage,narration:`${slide.editorialPackage.narration} Updated narration detail.`}}:slide)}),current);
 });
 
 test("project update freshness preserves the old approved path while a replacement Working image is pending",()=>{
   const project=fingerprintReadyProject(),slide=project.slides[0],approved=slide.background.approvedImagePath;
-  const changed={...slide,editorial:{...slide.editorial,displayHeadline:"A CHANGED LAYOUT HEADLINE"},compositionFingerprint:null,workingImageFingerprint:"layout-first-2.0.0:new-working",background:{...slide.background,workingImagePath:"C:\\Project\\Working\\replacement.png",approvedImagePath:approved,approvalLocked:false}};
+  const changed={...slide,editorialPackage:{...slide.editorialPackage,displayHeadline:"A CHANGED\\nLAYOUT HEADLINE",highlightPhrase:"LAYOUT HEADLINE"},compositionFingerprint:null,workingImageFingerprint:"layout-first-2.0.0:new-working",background:{...slide.background,workingImagePath:"C:\\Project\\Working\\replacement.png",approvedImagePath:approved,approvalLocked:false}};
   const stale=layoutFreshness.deriveLayoutStaleness({...project,slides:[changed]});
   assert.equal(changed.background.approvedImagePath,approved);
   assert.equal(changed.background.approvalLocked,false);
   assert.equal(stale.imageStale,true);
   assert.equal(stale.videoStale,true);
 });
+const projectUpdateWorkflow=loadTypeScript("src/components/Pipeline/ProjectUpdateWorkflow.ts");
+const queueItem=(id,number)=>({slideId:id,slideNumber:number,title:`Slide ${number}`,status:"pending",error:null,elapsedMs:0});
+
+test("Project Update panel visibly exposes every layout selector and scoped action",async()=>{
+  const source=await fs.readFile(path.join(process.cwd(),"src/components/Pipeline/ProjectUpdatePanel.tsx"),"utf8")+await fs.readFile(path.join(process.cwd(),"src/editorial/LayoutTemplates.ts"),"utf8");
+  for(const text of ["Layout Template","Editorial Left","Subtitle Safe Area","Headline Style","Highlight Color","Preview Layout","Current Slide","All Slides","Update Current Slide","Update All Stale Slides"])assert.match(source,new RegExp(text));
+});
+
+test("current-slide and all-stale selection remain explicitly scoped",()=>{
+  assert.deepEqual(projectUpdateWorkflow.selectUpdateSlideIds(["a","b","c"],"b","current"),["b"]);
+  assert.deepEqual(projectUpdateWorkflow.selectUpdateSlideIds(["a","b","c"],"b","all"),["a","b","c"]);
+});
+
+test("timed-out image request settles as failed instead of hanging",async()=>{
+  const controller=new projectUpdateWorkflow.UpdateQueueController();
+  const result=await projectUpdateWorkflow.runControlledUpdateQueue({items:[queueItem("a",1)],concurrency:1,timeoutMs:10,controller,execute:()=>new Promise(()=>{}),cancelRequest:async()=>true,onChange:()=>{}});
+  assert.equal(result[0].status,"failed");assert.match(result[0].error,/timed out/);
+});
+
+test("cancellation settles active and queued slides and preserves completed results",async()=>{
+  const controller=new projectUpdateWorkflow.UpdateQueueController();let rejectActive;
+  const run=projectUpdateWorkflow.runControlledUpdateQueue({items:[queueItem("a",1),queueItem("b",2),queueItem("c",3)],concurrency:1,timeoutMs:500,controller,execute:(item)=>item.slideId==="a"?Promise.resolve():new Promise((_,reject)=>{rejectActive=reject}),cancelRequest:async()=>{if(rejectActive)rejectActive(new Error("cancelled"));return true},onChange:()=>{}});
+  await new Promise(resolve=>setTimeout(resolve,5));controller.cancel(async()=>{if(rejectActive)rejectActive(new Error("cancelled"));return true});const result=await run;
+  assert.equal(result[0].status,"completed");assert.equal(result[1].status,"cancelled");assert.equal(result[2].status,"cancelled");
+});
+
+test("API failure settles queue and failed slides are retry-selectable",async()=>{
+  const controller=new projectUpdateWorkflow.UpdateQueueController();
+  const result=await projectUpdateWorkflow.runControlledUpdateQueue({items:[queueItem("a",1),queueItem("b",2)],concurrency:1,timeoutMs:100,controller,execute:async(item)=>{if(item.slideId==="a")throw new Error("malformed response")},cancelRequest:async()=>true,onChange:()=>{}});
+  assert.equal(result[0].status,"failed");assert.equal(result[1].status,"completed");assert.deepEqual(projectUpdateWorkflow.selectRetryItems(result).map(item=>item.slideId),["a"]);
+});
+
+test("controlled concurrency never exceeds the explicitly selected limit",async()=>{
+  const controller=new projectUpdateWorkflow.UpdateQueueController();let active=0,max=0;
+  const result=await projectUpdateWorkflow.runControlledUpdateQueue({items:[1,2,3,4].map(n=>queueItem(String(n),n)),concurrency:2,timeoutMs:500,controller,execute:async()=>{active++;max=Math.max(max,active);await new Promise(resolve=>setTimeout(resolve,8));active--},cancelRequest:async()=>true,onChange:()=>{}});
+  assert.equal(max,2);assert.ok(result.every(item=>item.status==="completed"));
+});
+const imageReviewWorkflow=loadTypeScript("src/imageReview/ImageReviewWorkflow.ts");
+test("successful update opens Working Image Review and selects the updated slide",async()=>{const source=await fs.readFile(path.join(process.cwd(),"src/App.tsx"),"utf8");assert.match(source,/selectSlide\(successfulIds\[0\]\)/);assert.match(source,/setActiveNav\("Image Review"\)/)});
+test("Working Image Review displays verified Working and Approved paths side by side",async()=>{const source=await fs.readFile(path.join(process.cwd(),"src/imageReview/WorkingImageReview.tsx"),"utf8");for(const text of ["Current Approved","New Working","Working file","Approved file","review-comparison"])assert.match(source,new RegExp(text))});
+test("missing Working file is treated as generation failure before completion",async()=>{const source=await fs.readFile(path.join(process.cwd(),"src/App.tsx"),"utf8");assert.ok(source.indexOf("readSlideImage(result.filePath)")<source.indexOf("completed.set(slide.id,result)"))});
+test("Approve Replacement updates the approved reference and invalidates editorial assets",()=>{const project=fingerprintReadyProject(),slide=project.slides[0],next=imageReviewWorkflow.applyApprovedReplacement({...project,slides:[{...slide,workingImageFingerprint:"new-fp"}]},slide.id,"C:\\Project\\Approved\\new.png","2026-01-01T00:00:00Z");assert.equal(next.slides[0].background.approvedImagePath,"C:\\Project\\Approved\\new.png");assert.equal(next.slides[0].approvedImageFingerprint,"new-fp");assert.equal(next.slideTextOverlay.freshness,null)});
+test("replacement approval archives the previous Approved file in History",async()=>{const source=await fs.readFile(path.join(process.cwd(),"electron/main.cjs"),"utf8");assert.match(source,/workspace\.history/);assert.match(source,/historyPath/);assert.ok(source.indexOf("fs.copyFile(filePath, historyPath)")<source.indexOf("fs.copyFile(source, filePath)"))});
+test("Keep Existing Approved preserves project approval",()=>{const project=fingerprintReadyProject();assert.equal(imageReviewWorkflow.keepExistingApproval(project),project)});
+test("batch review advances to the next Working slide",()=>{assert.equal(imageReviewWorkflow.nextReviewSlideId(["a","b","c"],"a"),"b");assert.equal(imageReviewWorkflow.nextReviewSlideId(["a","b","c"],"c"),null)});
+test("Preview Layout renders an actual image frame and composition zones",async()=>{const source=await fs.readFile(path.join(process.cwd(),"src/imageReview/WorkingImageReview.tsx"),"utf8");assert.match(source,/<img src=\{url\}/);assert.match(source,/Editorial text zone/);assert.match(source,/Subject zone/);assert.match(source,/Caption-safe zone/);assert.match(source,/Layout Preview — Not Final Video/)});
+test("narrow review uses Approved and Working tabs",async()=>{const css=await fs.readFile(path.join(process.cwd(),"src/App.css"),"utf8"),source=await fs.readFile(path.join(process.cwd(),"src/imageReview/WorkingImageReview.tsx"),"utf8");assert.match(css,/@media\(max-width:800px\)/);assert.match(css,/tab-working/);assert.match(source,/review-tabs/)});
+const editorialPackageDirector=loadTypeScript("src/editorial/EditorialPackageDirector.ts");
+test("Script Director generates a complete valid Editorial Package",()=>{const pkg=editorialPackageDirector.generateEditorialPackage({title:"Your Phone Number Can Be Stolen",body:"A criminal can move your number to another device without touching your phone.",cta:"Follow for more."});assert.ok(pkg.displayHeadline.includes("\n"));assert.ok(pkg.highlightPhrase);assert.ok(pkg.displayHeadline.replace(/\n/g," ").includes(pkg.highlightPhrase));assert.ok(pkg.supportLine);assert.ok(pkg.narration);assert.ok(pkg.posterPrompt);assert.ok(pkg.motionHint);assert.ok(pkg.captionHint);assert.deepEqual(editorialPackageDirector.validateEditorialPackage(pkg),[])});
+test("Editorial Package validation rejects long headlines missing highlights and narration",()=>{const pkg=editorialPackageDirector.generateEditorialPackage({title:"Short Headline",body:"Useful explanation for a beginner."});const errors=editorialPackageDirector.validateEditorialPackage({...pkg,displayHeadline:"ONE TWO THREE FOUR FIVE SIX SEVEN EIGHT NINE",highlightPhrase:"MISSING",narration:""});assert.ok(errors.some(e=>/eight words/i.test(e)));assert.ok(errors.some(e=>/must appear/i.test(e)));assert.ok(errors.some(e=>/Narration/i.test(e)))});
+test("renderer uses Editorial Package and ignores legacy Title and Body",()=>{const slide=projectFactory.createSlide(1),pkg={...slide.editorialPackage,displayHeadline:"PACKAGE\nHEADLINE",highlightPhrase:"HEADLINE",supportLine:"Package support adds specific context.",narration:"Independent spoken narration."},editorial=editorialDirector.generateEditorialLayouts([{...slide,title:"POISON TITLE",body:"POISON BODY",editorialPackage:pkg}],[],"Click the Follow button to see new cybersecurity tips every day.")[0].editorial,ass=editorialCjs.buildEditorialAss([{number:1,title:"POISON TITLE",body:"POISON BODY",editorialPackage:pkg,editorial}],[{slideNumber:1,sceneStartSeconds:0,sceneEndSeconds:3}],{});assert.match(ass,/PACKAGE/);assert.match(ass,/HEADLINE/);assert.match(ass,/Package\\Nsupport/);assert.doesNotMatch(ass,/POISON TITLE|POISON BODY/)});
+test("renderer preserves manual Editorial Package line breaks exactly",()=>{const slide=projectFactory.createSlide(1),pkg={...slide.editorialPackage,displayHeadline:"ONE CLICK\nCAN INFECT\nYOUR BUSINESS",highlightPhrase:"ONE CLICK",supportLine:"A single attachment can spread malware across connected devices.",narration:"Here is the narration."},result=editorialDirector.generateEditorialLayouts([{...slide,editorialPackage:pkg}],[],"Click the Follow button to see new cybersecurity tips every day.")[0];assert.deepEqual(result.editorial.headlineLines.map(line=>line.text),["ONE CLICK","CAN INFECT","YOUR BUSINESS"])});
+test("legacy project migration creates one editable Editorial Package",()=>{const base=projectFactory.createProject("Legacy Editorial"),legacy={...base,slides:base.slides.map(({editorialPackage,...slide})=>({...slide,title:"Legacy Title",body:"Legacy body explains the topic clearly.",editorial:{...editorialDirector.generateEditorialLayouts([{...slide,title:"Legacy Title",body:"Legacy body explains the topic clearly.",editorialPackage}],[],"Click the Follow button to see new cybersecurity tips every day.")[0].editorial,displayHeadline:"MANUAL\nLEGACY HEADLINE",emphasizedText:"LEGACY HEADLINE",supportingLine:"Existing manual support remains intact.",manualOverride:true}}))},migrated=loadTypeScript("src/services/ProjectFileService.ts").deserializeProject(JSON.stringify(legacy));assert.equal(migrated.slides[0].editorialPackage.displayHeadline,"MANUAL\nLEGACY HEADLINE");assert.equal(migrated.slides[0].editorialPackage.manuallyEdited,true)});
+test("voice renderer consumes Editorial Package narration only",async()=>{const source=await fs.readFile(path.join(process.cwd(),"electron/voice/registerVoiceHandlers.cjs"),"utf8");assert.match(source,/editorialPackage\?\.narration/);const helper=source.slice(source.indexOf("function narrationForSlide"),source.indexOf("function registerCyberSlideVoiceHandlers"));assert.doesNotMatch(helper,/slide\?\.title|slide\?\.body/)});

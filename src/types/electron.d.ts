@@ -55,8 +55,9 @@ declare global {
         sourcePath: string;
         slideNumber: number;
         projectName: string;
-      }) => Promise<{ filePath: string; approvedAt: string }>;
+      }) => Promise<{ filePath: string; approvedAt: string; historyPath: string | null }>;
       readSlideImage: (filePath: string) => Promise<string>;
+      openWorkingFolder: (projectName: string) => Promise<string>;
       saveFluxApiKey: (apiKey: string) => Promise<boolean>;
       hasFluxApiKey: () => Promise<boolean>;
       testFluxConnection: () => Promise<{
@@ -88,6 +89,7 @@ declare global {
         count?: number;
         quality?: "low" | "medium" | "high";
         subtitleSafeArea?: 20 | 25 | 30;
+        requestId?: string;
       }) => Promise<{ posters: GeneratedPosterResult[] }>;
       exportProductionPackage: (
         payload: ProductionPackagePayload,
@@ -119,6 +121,7 @@ declare global {
         version?: string;
         error?: string;
       }>;
+      cancelOpenAIPosterGeneration: (requestId: string) => Promise<boolean>;
       renderNativeVideo: (
         plan: NativeVideoPlan,
       ) => Promise<NativeVideoRenderResult>;
@@ -154,8 +157,7 @@ declare global {
         projectName: string;
         slides: Array<{
           number: number;
-          title: string;
-          body: string;
+          editorialPackage: import("../editorial/EditorialPackageDirector").EditorialPackage;
           editorial?: import("../editorial/types").SlideEditorialLayout | null;
         }>;
         scenes: Array<{

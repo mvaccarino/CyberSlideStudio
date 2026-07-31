@@ -8,6 +8,7 @@ import type { Project } from "../models/Project";
 import type { ProductionTemplate } from "./types";
 import { applyOverlayTheme } from "../captions/styles";
 import { ensureCompositionPlan } from "../editorial/CompositionPlan";
+import { generateEditorialPackage } from "../editorial/EditorialPackageDirector";
 import {
   appendCTA,
   applyProjectCTA,
@@ -34,6 +35,7 @@ export function projectFromTemplate(
       body: item.body,
       cta: index === template.slides.length - 1 ? selectedCTA : "",
       notes: index === 0 ? template.voiceScript : "",
+      editorialPackage: generateEditorialPackage({title:item.title,body:item.body,cta:index === template.slides.length - 1 ? selectedCTA : "",posterPrompt:template.posterPrompt,motionHint:template.cameraStyle,captionHint:template.captionStyle}),
       background: {
         ...slide.background,
         prompt: template.posterPrompt,

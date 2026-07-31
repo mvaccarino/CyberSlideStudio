@@ -1,0 +1,5 @@
+import type { Project } from "../models/Project";
+export const nextReviewSlideId=(ids:string[],currentId:string):string|null=>{const index=ids.indexOf(currentId);return index>=0?ids[index+1]||null:ids[0]||null};
+export function applyApprovedReplacement(project:Project,slideId:string,filePath:string,approvedAt:string):Project{return {...project,slides:project.slides.map(slide=>slide.id===slideId?{...slide,background:{...slide.background,imagePath:filePath,approvedImagePath:filePath,approvedAt,approvalLocked:true},approvedImageFingerprint:slide.workingImageFingerprint||slide.compositionFingerprint,layoutWarnings:[]}:slide),slideTextOverlay:{...project.slideTextOverlay,freshness:null,layoutFingerprint:null}}}
+export const keepExistingApproval=<T extends Project>(project:T):T=>project;
+export const successfulWorkingIds=(results:Array<{success:boolean;slideId:string;workingImagePath:string|null}>)=>results.filter(result=>result.success&&Boolean(result.workingImagePath)).map(result=>result.slideId);

@@ -1,6 +1,7 @@
 import type { SlideEditorialLayout } from "../editorial/types";
 import type { CompositionPlan, CompositionValidationResult } from "../editorial/CompositionPlan";
 import type { LayoutTemplateId } from "../editorial/LayoutTemplates";
+import type { EditorialPackage } from "../editorial/EditorialPackageDirector";
 
 export type SlideStatus =
   "draft" | "ready" | "generating" | "generated" | "error";
@@ -60,6 +61,7 @@ export type Slide = {
   theme: SlideTheme;
   background: SlideBackground;
   typography: SlideTypography;
+  editorialPackage: EditorialPackage;
   editorial: SlideEditorialLayout | null;
   layoutTemplateId: LayoutTemplateId;
   compositionPlan: CompositionPlan | null;
@@ -69,6 +71,7 @@ export type Slide = {
   layoutWarnings: string[];
   compositionFingerprint: string | null;
   workingImageFingerprint: string | null;
+  workingGeneratedAt: string | null;
   approvedImageFingerprint: string | null;
   lastImagePrompt: string;
   captionSafeZonePercent: number;

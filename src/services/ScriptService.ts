@@ -6,6 +6,7 @@ import {
   type SlideField,
 } from "../parser/parseScript";
 import { createSlide } from "./ProjectFactory";
+import { generateEditorialPackage } from "../editorial/EditorialPackageDirector";
 
 const parserFields = new Set<SlideField | "slide">([
   "title",
@@ -45,6 +46,8 @@ export function scriptToProjectSlides(
       body: parsedSlide.body,
       cta: parsedSlide.cta,
       notes: parsedSlide.notes,
+      editorialPackage: base.editorialPackage?.manuallyEdited ? base.editorialPackage : generateEditorialPackage({title:parsedSlide.title,body:parsedSlide.body,cta:parsedSlide.cta,layoutTemplate:base.layoutTemplateId,posterPrompt:base.editorialPackage?.posterPrompt,motionHint:base.editorialPackage?.motionHint,captionHint:base.editorialPackage?.captionHint}),
+      editorial: base.editorialPackage?.manuallyEdited ? base.editorial : null,
       validation: toModelValidation(parsedSlide),
       status: parsedSlide.isValid ? ("ready" as const) : ("draft" as const),
       updatedAt: new Date().toISOString(),

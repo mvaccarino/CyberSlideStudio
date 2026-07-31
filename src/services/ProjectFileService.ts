@@ -1,4 +1,5 @@
 import type { Project, ProjectSettings, Slide } from "../models";
+import { migrateEditorialPackage } from "../editorial/EditorialPackageDirector";
 import {
   createDefaultSettings,
   createProject,
@@ -77,6 +78,7 @@ function normalizeSlide(value: unknown, index: number): Slide {
       ...defaults.typography,
       ...typography,
     },
+    editorialPackage: migrateEditorialPackage({title,body,cta:typeof value.cta === "string" ? value.cta : "",layoutTemplateId,editorial:isRecord(value.editorial) ? value.editorial : null}, value.editorialPackage),
     editorial: isRecord(value.editorial)
       ? (() => {
           const legacy = value.editorial;
@@ -114,6 +116,7 @@ function normalizeSlide(value: unknown, index: number): Slide {
     layoutWarnings: Array.isArray(value.layoutWarnings) ? value.layoutWarnings.filter((item): item is string => typeof item === "string") : (typeof background.approvedImagePath === "string" ? ["Approved image predates layout-first planning; regenerate only if visual zones do not match."] : []),
     compositionFingerprint: typeof value.compositionFingerprint === "string" ? value.compositionFingerprint : null,
     workingImageFingerprint: typeof value.workingImageFingerprint === "string" ? value.workingImageFingerprint : null,
+    workingGeneratedAt: typeof value.workingGeneratedAt === "string" ? value.workingGeneratedAt : null,
     approvedImageFingerprint: typeof value.approvedImageFingerprint === "string" ? value.approvedImageFingerprint : null,
     lastImagePrompt: typeof value.lastImagePrompt === "string" ? value.lastImagePrompt : "",
     validation: Array.isArray(value.validation) ? value.validation : [],

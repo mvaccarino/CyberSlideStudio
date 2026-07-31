@@ -1,7 +1,8 @@
 import type { ApprovedAsset, ProductionStyleName } from "../aiDirector/types";
 import type { Slide } from "../models/Slide";
 import type { EditorialPosterStyle, SlideEditorialLayout } from "./types";
-import { decideEditorialLayout, decisionFromCompositionPlan, designHeadlineStack } from "./EditorialLayoutDirector";
+import { decideEditorialLayout, decisionFromCompositionPlan } from "./EditorialLayoutDirector";
+import { migrateEditorialPackage, validateEditorialPackage } from "./EditorialPackageDirector";
 import { getLayoutTemplate } from "./LayoutTemplates";
 
 export const EDITORIAL_PRESETS: Record<
@@ -119,65 +120,13 @@ export function simplifyDisplayHeadline(title: string): string {
   while (list.length < 3) list.push("MATTERS");
   return list.join(" ").toUpperCase();
 }
-function emphasize(headline: string, previous = ""): string {
-  const candidates = [
-    "NOT ENOUGH",
-    "READ YOUR DATA",
-    "FAKE VOICE",
-    "ONE CLICK",
-    "CAN BE STOLEN",
-    "STOP THE ATTACK",
-    "RANSOMWARE",
-    "STOLEN",
-    "WARNING",
-    "RISK",
-    "ATTACK",
-    "PASSWORD",
-  ];
-  const found = candidates.find((v) => headline.includes(v) && v !== previous);
-  if (found) return found;
-  const headlineWords = words(headline);
-  const filler = /^(THE|A|AN|YOUR|THIS|THAT|HOW|WHAT|WHY|USE|IN|IS|CAN|BE)$/i;
-  const lastIndex = headlineWords.findLastIndex((value) => !filler.test(value));
-  if (lastIndex < 0) return headlineWords.at(-1) || "FOCUS";
-  const prior = headlineWords[lastIndex - 1];
-  return prior && !filler.test(prior)
-    ? `${prior} ${headlineWords[lastIndex]}`
-    : headlineWords[lastIndex];
-}
-function supportLine(body: string, cta: string, isFinal: boolean): string {
-  if (isFinal && cta.trim()) return cta.trim();
-  const sentence = (body.trim().split(/(?<=[.!?])\s+/)[0] || body)
-    .replace(/\s+/g, " ")
-    .trim();
-  const clause = sentence.split(/[,;]|\b(?:while|when|then|but)\b/i)[0].trim();
-  const clauseWords = words(clause);
-  if (clauseWords.length >= 6 && normalize(clause) !== normalize(sentence))
-    return `${clause.replace(/[.!?]+$/, "")}.`;
-  const rewritten = sentence
-    .replace(/\bcan\b/i, "may")
-    .replace(/\bevery\b/i, "each")
-    .replace(/\bone\b/i, "a single")
-    .replace(/\bif service disappears\b/i, "when service suddenly disappears")
-    .replace(/\bHang up and call\b/i, "Hang up, then call")
-    .replace(/\bon a trusted\b/i, "through a trusted")
-    .replace(/[.!?]+$/, "");
-  const rewrittenWords = words(rewritten);
-  if (rewrittenWords.length > 16)
-    return `${rewrittenWords.slice(0, 15).join(" ")}…`;
-  if (normalize(rewritten) !== normalize(sentence)) return `${rewritten}.`;
-  return `${words(sentence).slice(0, 15).join(" ")}…`;
-}
 export function imageAwarePlacement(
   analysis?: ApprovedAsset["analysis"],
 ): Pick<SlideEditorialLayout, "layoutAlignment" | "posterTextRegion"> {
   const decision = decideEditorialLayout({ analysis });
   return { layoutAlignment: decision.alignment, posterTextRegion: decision.alignment === "left" ? "upper-left" : "upper-right" };
 }
-export function validateEditorial(
-  layout: SlideEditorialLayout,
-  body: string,
-): string[] {
+export function validateEditorial(layout: SlideEditorialLayout): string[] {
   const errors: string[] = [];
   if (!normalize(layout.displayHeadline).includes(normalize(layout.emphasizedText)))
     errors.push("Emphasized text must appear inside the headline.");
@@ -189,8 +138,6 @@ export function validateEditorial(
     [...a].filter((v) => b.has(v)).length /
     Math.max(1, new Set([...a, ...b]).size);
   if (overlap > 0.72) errors.push("Headline and support are near-duplicates.");
-  if (layout.supportingLine.trim() === body.trim())
-    errors.push("Full slide body cannot be rendered as support.");
   if (layout.headlineLines?.some((line) => /^(IN|A|THE|TO)$/i.test(line.text.trim())))
     errors.push("Headline contains an isolated filler-word line.");
   if (layout.headlineLines?.length > 5) errors.push("Headline exceeds five lines.");
@@ -203,12 +150,12 @@ export function generateEditorialLayouts(
   assets: ApprovedAsset[],
   brandCTA: string,
 ): Slide[] {
-  let previous = "";
+  void brandCTA;
   const bySlide = new Map(assets.map((a) => [a.slideNumber, a]));
-  return slides.map((slide, index) => {
-    const displayHeadline = simplifyDisplayHeadline(slide.title),
-      emphasizedText = emphasize(displayHeadline, previous);
-    previous = emphasizedText;
+  return slides.map((slide) => {
+    const editorialPackage = slide.editorialPackage || migrateEditorialPackage(slide);
+    const displayHeadline = editorialPackage.displayHeadline,
+      emphasizedText = editorialPackage.highlightPhrase;
     const existing = slide.editorial;
     const approvedAsset = bySlide.get(slide.number);
     const decision = slide.compositionPlan
@@ -223,24 +170,16 @@ export function generateEditorialLayouts(
         });
     const layoutTemplate = getLayoutTemplate(slide.layoutTemplateId);
     const placement = { layoutAlignment: decision.alignment, posterTextRegion: decision.alignment === "left" ? "upper-left" as const : "upper-right" as const };
-    const generatedSupport = supportLine(
-      slide.body,
-      brandCTA,
-      index === slides.length - 1,
-    );
-    const cappedSupport =
-      words(generatedSupport).length > 16
-        ? `${words(generatedSupport).slice(0, 15).join(" ")}…`
-        : generatedSupport;
-    const supportingLine = `${cappedSupport.charAt(0).toUpperCase()}${cappedSupport.slice(1)}`;
+    const supportingLine = editorialPackage.supportLine;
     const headlineSize = Math.max(layoutTemplate.headlineSizeRange[0], existing?.headlineSize || Math.min(160,layoutTemplate.headlineSizeRange[1]));
     const stackLayout = existing?.manualOverride ? existing.stackLayout : "Block Stack";
     const lineOffsets = existing?.manualOverride ? existing.lineOffsets : [];
-    const headlineLines = designHeadlineStack(existing?.manualOverride ? existing.displayHeadline : displayHeadline, existing?.manualOverride ? existing.emphasizedText : emphasizedText, existing?.manualOverride ? existing.headlineWidth : decision.maximumHeadlineWidth, headlineSize, stackLayout, lineOffsets);
+    const exactLines = displayHeadline.split(/\r?\n/).filter(Boolean);
+    const headlineLines = exactLines.map((text,index)=>({text,xOffset:lineOffsets[index]||0,width:existing?.headlineWidth||decision.maximumHeadlineWidth,fontSize:headlineSize,alignment:decision.alignment,emphasized:text.trim().toLocaleLowerCase()===emphasizedText.trim().toLocaleLowerCase()}));
     const editorial: SlideEditorialLayout = {
-      displayHeadline: existing?.manualOverride ? existing.displayHeadline : displayHeadline,
-      emphasizedText: existing?.manualOverride ? existing.emphasizedText : emphasizedText,
-      supportingLine: existing?.manualOverride ? existing.supportingLine : supportingLine,
+      displayHeadline,
+      emphasizedText,
+      supportingLine,
       ...placement,
       layoutOverride: existing?.layoutOverride || "auto",
       headlineWidth: existing?.manualOverride ? existing.headlineWidth : decision.maximumHeadlineWidth,
@@ -263,8 +202,8 @@ export function generateEditorialLayouts(
     };
     editorial.validationWarnings = [
       ...decision.layoutWarnings,
-      ...validateEditorial(editorial, slide.body),
+      ...validateEditorialPackage(editorialPackage),
     ];
-    return { ...slide, editorial, headlineLineBreaks: headlineLines.map(line=>line.text), layoutWarnings:[...(slide.layoutWarnings||[]),...editorial.validationWarnings] };
+    return { ...slide, editorialPackage, editorial, headlineLineBreaks: headlineLines.map(line=>line.text), layoutWarnings:[...(slide.layoutWarnings||[]),...editorial.validationWarnings] };
   });
 }

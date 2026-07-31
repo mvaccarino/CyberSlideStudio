@@ -120,6 +120,15 @@ export function TextSubtitlesPanel({
           slide.id === selected.id
             ? {
                 ...slide,
+                editorialPackage: {
+                  ...slide.editorialPackage,
+                  displayHeadline: patch.displayHeadline ?? slide.editorialPackage.displayHeadline,
+                  highlightPhrase: patch.emphasizedText ?? slide.editorialPackage.highlightPhrase,
+                  supportLine: patch.supportingLine ?? slide.editorialPackage.supportLine,
+                  headlineScale: patch.headlineSize ? patch.headlineSize / 138 : slide.editorialPackage.headlineScale,
+                  supportScale: patch.supportSize ? patch.supportSize / 44 : slide.editorialPackage.supportScale,
+                  manuallyEdited: true,
+                },
                 editorial: {
                   ...(slide.editorial || {
                     displayHeadline: "",
@@ -158,7 +167,7 @@ export function TextSubtitlesPanel({
   const setLayoutTemplate = (value: string) => {
     if (!selected) return;
     const layoutTemplateId=(value==="auto"?"editorial-left":value) as LayoutTemplateId;
-    onChange({...project,slides:project.slides.map(slide=>slide.id===selected.id?{...slide,layoutTemplateId,compositionPlan:createCompositionPlan(slide,layoutTemplateId),editorial:null,compositionValidation:slide.background.approvedImagePath?emptyValidationResult():null,layoutWarnings:slide.background.approvedImagePath?["Approved image is preserved but may not match the new layout. Use Regenerate Image for Layout when ready."]:[]}:slide),slideTextOverlay:{...overlay,freshness:null,layoutFingerprint:null},pipelineStatus:statusThrough(["script"],"images")});
+    onChange({...project,slides:project.slides.map(slide=>slide.id===selected.id?{...slide,layoutTemplateId,editorialPackage:{...slide.editorialPackage,layoutTemplate:layoutTemplateId,manuallyEdited:true},compositionPlan:createCompositionPlan(slide,layoutTemplateId),editorial:null,compositionValidation:slide.background.approvedImagePath?emptyValidationResult():null,layoutWarnings:slide.background.approvedImagePath?["Approved image is preserved but may not match the new layout. Use Regenerate Image for Layout when ready."]:[]}:slide),slideTextOverlay:{...overlay,freshness:null,layoutFingerprint:null},pipelineStatus:statusThrough(["script"],"images")});
     setMessage("Layout template selected before image generation. Existing approved artwork was preserved.");
   };
   const regenerate = () => {
@@ -191,10 +200,9 @@ export function TextSubtitlesPanel({
         ),
         result = await window.cyberSlideStudio.generateCaptionAssets({
           projectName,
-          slides: slides.map(({ number, title, body, editorial }) => ({
+          slides: slides.map(({ number, editorialPackage, editorial }) => ({
             number,
-            title,
-            body,
+            editorialPackage,
             editorial,
           })),
           scenes: project.voiceover.scenes,
@@ -287,7 +295,7 @@ export function TextSubtitlesPanel({
       <label>
         Display headline
         <textarea
-          value={editorial?.displayHeadline || ""}
+          value={selected?.editorialPackage.displayHeadline || ""}
           onChange={(event) =>
             patchEditorial({
               displayHeadline: event.target.value.toUpperCase(),
@@ -296,9 +304,9 @@ export function TextSubtitlesPanel({
         />
       </label>
       <label>
-        Emphasized text
+        Highlight phrase
         <input
-          value={editorial?.emphasizedText || ""}
+          value={selected?.editorialPackage.highlightPhrase || ""}
           onChange={(event) =>
             patchEditorial({ emphasizedText: event.target.value.toUpperCase() })
           }
@@ -315,11 +323,15 @@ export function TextSubtitlesPanel({
       <label>
         Supporting line
         <textarea
-          value={editorial?.supportingLine || ""}
+          value={selected?.editorialPackage.supportLine || ""}
           onChange={(event) =>
             patchEditorial({ supportingLine: event.target.value })
           }
         />
+      </label>
+      <label>
+        Narration
+        <textarea value={selected?.editorialPackage.narration || ""} onChange={(event) => selected && onChange({...project,slides:project.slides.map(slide=>slide.id===selected.id?{...slide,editorialPackage:{...slide.editorialPackage,narration:event.target.value,manuallyEdited:true}}:slide),subtitles:{...subtitles,freshness:null},pipelineStatus:statusThrough(["script","images"],"voice")})} />
       </label>
       <label>
         Layout override

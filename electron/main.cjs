@@ -1,10 +1,10 @@
-﻿const secureStore = require("./secureStore.cjs");
+const secureStore = require("./secureStore.cjs");
 const fluxService = require("./fluxService.cjs");
 const openAIImageService = require("./openAIImageService.cjs");
 const {
   registerProductionPackageHandlers,
 } = require("./productionPackageHandlers.cjs");
-const { app, BrowserWindow, Menu, dialog, ipcMain } = require("electron");
+const { app, BrowserWindow, Menu, dialog, ipcMain, shell } = require("electron");
 const {
   registerCyberSlideVoiceHandlers,
 } = require("./voice/registerVoiceHandlers.cjs");
@@ -253,8 +253,24 @@ ipcMain.handle("slide:approve", async (_event, payload) => {
     workspace.approved,
     `slide-${String(slideNumber).padStart(2, "0")}-approved.png`,
   );
+  let historyPath = null;
+  try {
+    await fs.access(filePath);
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    historyPath = path.join(workspace.history, `slide-${String(slideNumber).padStart(2, "0")}-approved-${stamp}.png`);
+    await fs.copyFile(filePath, historyPath);
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
   await fs.copyFile(source, filePath);
-  return { filePath, approvedAt: new Date().toISOString() };
+  return { filePath, approvedAt: new Date().toISOString(), historyPath };
+});
+
+ipcMain.handle("slide:open-working-folder", async (_event, projectName) => {
+  const workspace = await ensureWorkspace(projectName);
+  const error = await shell.openPath(workspace.working);
+  if (error) throw new Error(error);
+  return workspace.working;
 });
 
 ipcMain.handle("slide:read-image", async (_event, filePath) => {
@@ -302,47 +318,51 @@ ipcMain.handle("openai:test-connection", async () => {
   return openAIImageService.testConnection(apiKey);
 });
 
+const openAIImageRequests = new Map();
+ipcMain.handle("openai:cancel-generate-posters", (_event, requestId) => {
+  const controller = openAIImageRequests.get(requestId);
+  if (!controller) return false;
+  controller.abort();
+  return true;
+});
+
 ipcMain.handle("openai:generate-posters", async (_event, payload) => {
   const apiKey = await secureStore.getSecret("openAIApiKey");
   if (!apiKey) throw new Error("No OpenAI API key has been saved.");
-
   const slideNumber = Number(payload?.slideNumber);
-  if (!Number.isInteger(slideNumber) || slideNumber < 1) {
-    throw new Error("A valid slide number is required.");
-  }
-
-  const workspace = await ensureWorkspace(payload?.projectName);
-  const quality = payload?.quality || "high";
-  const outputDirectory = workspace.working;
-
-  const generated = await openAIImageService.generatePosters({
-    apiKey,
-    prompt: payload?.prompt,
-    count: payload?.count,
-    quality,
-    size: "1088x1920",
-    subtitleSafeArea: payload?.subtitleSafeArea,
-  });
-
-  const posters = [];
-  for (let index = 0; index < generated.length; index += 1) {
-    const image = generated[index];
-    const buffer = Buffer.from(image.base64, "base64");
-    const suffix = generated.length > 1 ? `-concept-${index + 1}` : "";
-    const stage = "working";
-    const filename = `slide-${String(slideNumber).padStart(2, "0")}${suffix}-${stage}.png`;
-    const filePath = path.join(outputDirectory, filename);
-    await fs.writeFile(filePath, buffer);
-    posters.push({
-      dataUrl: `data:image/png;base64,${image.base64}`,
-      filePath,
-      revisedPrompt: image.revisedPrompt,
+  if (!Number.isInteger(slideNumber) || slideNumber < 1) throw new Error("A valid slide number is required.");
+  const requestId = typeof payload?.requestId === "string" && payload.requestId ? payload.requestId : `poster-${Date.now()}`;
+  const controller = new AbortController();
+  openAIImageRequests.set(requestId, controller);
+  try {
+    const workspace = await ensureWorkspace(payload?.projectName);
+    const generated = await openAIImageService.generatePosters({
+      apiKey,
+      prompt: payload?.prompt,
+      count: payload?.count,
+      quality: payload?.quality || "high",
+      size: "1088x1920",
+      subtitleSafeArea: payload?.subtitleSafeArea,
+      signal: controller.signal,
     });
+    const posters = [];
+    for (let index = 0; index < generated.length; index += 1) {
+      if (controller.signal.aborted) throw new Error(`Poster generation cancelled for slide ${slideNumber}.`);
+      const image = generated[index];
+      const suffix = generated.length > 1 ? `-concept-${index + 1}` : "";
+      const filePath = path.join(workspace.working, `slide-${String(slideNumber).padStart(2, "0")}${suffix}-working.png`);
+      await fs.writeFile(filePath, Buffer.from(image.base64, "base64"));
+      if (process.env.NODE_ENV !== "production") console.info("[ProjectUpdate] file write", { requestId, slideNumber, filePath });
+      posters.push({ dataUrl: `data:image/png;base64,${image.base64}`, filePath, revisedPrompt: image.revisedPrompt });
+    }
+    return { posters };
+  } catch (error) {
+    if (controller.signal.aborted) throw new Error(`Poster generation cancelled for slide ${slideNumber}.`);
+    throw error;
+  } finally {
+    openAIImageRequests.delete(requestId);
   }
-
-  return { posters };
 });
-
 ipcMain.handle("flux:save-api-key", async (_event, apiKey) => {
   await secureStore.setSecret("fluxApiKey", apiKey);
   return true;

@@ -34,10 +34,7 @@ async function buildFullNarration(scenes, outputPath) {
   await run(ffmpeg.path, args);
 }
 function narrationForSlide(slide) {
-  return [slide?.title, slide?.body, slide?.cta]
-    .map((value) => String(value || "").trim())
-    .filter(Boolean)
-    .join(". ");
+  return String(slide?.editorialPackage?.narration || "").trim();
 }
 
 function registerCyberSlideVoiceHandlers({ ensureWorkspace, getMainWindow }) {

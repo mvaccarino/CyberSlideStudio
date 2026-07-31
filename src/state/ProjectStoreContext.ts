@@ -20,6 +20,7 @@ export type SlideContentPatch = Partial<
     | "layoutWarnings"
     | "compositionFingerprint"
     | "workingImageFingerprint"
+    | "workingGeneratedAt"
     | "approvedImageFingerprint"
     | "lastImagePrompt"
     | "editorial"

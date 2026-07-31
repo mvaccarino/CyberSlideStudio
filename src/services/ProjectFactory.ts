@@ -4,6 +4,7 @@ import { DEFAULT_BRAND_CTA } from "../brand/BrandCTAEngine";
 import { loadBrandSettings } from "../brand/BrandSettingsService";
 import { loadSubtitleSafeArea } from "../composition/CompositionDirector";
 import { createCompositionPlan } from "../editorial/CompositionPlan";
+import { generateEditorialPackage } from "../editorial/EditorialPackageDirector";
 
 function createId(prefix: string): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -70,6 +71,7 @@ export function createSlide(number: number): Slide {
       titleAlignment: "left",
       bodyAlignment: "left",
     },
+    editorialPackage: generateEditorialPackage({title:"",body:"",layoutTemplate:"editorial-left"}),
     editorial: null,
     layoutTemplateId: "editorial-left",
     compositionPlan: createCompositionPlan({title:"",body:"",captionSafeZonePercent:25},"editorial-left"),
@@ -79,6 +81,7 @@ export function createSlide(number: number): Slide {
     layoutWarnings: [],
     compositionFingerprint: null,
     workingImageFingerprint: null,
+    workingGeneratedAt: null,
     approvedImageFingerprint: null,
     lastImagePrompt: "",
     captionSafeZonePercent: 25,

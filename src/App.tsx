@@ -19,7 +19,7 @@ import { buildPosterPrompt } from "./services/PosterPromptBuilder";
 import { generatePoster } from "./services/PosterGenerationService";
 import { normalizeSubtitleSafeArea } from "./composition/CompositionDirector";
 import { generateEditorialLayouts } from "./editorial/EditorialDirector";
-import { ensureCompositionPlan } from "./editorial/CompositionPlan";
+import { createCompositionPlan, ensureCompositionPlan } from "./editorial/CompositionPlan";
 import { deriveLayoutStaleness, projectLayoutFingerprint, slideLayoutFingerprint, voiceInputFingerprint, withDesiredFingerprint } from "./editorial/LayoutFreshness";
 import { useProjectStore } from "./state/useProjectStore";
 import type { ProjectMenuAction } from "./types/electron";
@@ -27,7 +27,8 @@ import type { Project } from "./models/Project";
 import { BrandSettingsPage } from "./settings/BrandSettingsPage";
 import { applyProjectCTA, resolveProjectCTA } from "./brand/BrandCTAEngine";
 import { ProductionPipeline } from "./components/Pipeline/ProductionPipeline";
-import { ProjectUpdatePanel } from "./components/Pipeline/ProjectUpdatePanel";
+import { ProjectUpdatePanel, type UpdateSettings } from "./components/Pipeline/ProjectUpdatePanel";
+import { idleUpdateQueue, runControlledUpdateQueue, UpdateQueueController, type UpdateQueueSnapshot, type ProjectUpdateResult } from "./components/Pipeline/ProjectUpdateWorkflow";
 import { ProjectDashboard } from "./components/Pipeline/ProjectDashboard";
 import { ContentLibraryScreen } from "./library/ContentLibraryScreen";
 import { projectFromTemplate } from "./library/TemplateProjectFactory";
@@ -36,6 +37,8 @@ import { FinalReviewScreen } from "./finalReview/FinalReviewScreen";
 import { PublishScreen } from "./finalReview/PublishScreen";
 import { CompletionDialog } from "./finalReview/CompletionDialog";
 import { HomeScreen, type RecentProject } from "./home/HomeScreen";
+import { WorkingImageReview } from "./imageReview/WorkingImageReview";
+import { applyApprovedReplacement, nextReviewSlideId } from "./imageReview/ImageReviewWorkflow";
 import { AIDirectorPanel } from "./components/Pipeline/AIDirectorPanel";
 import {
   advance,
@@ -68,6 +71,7 @@ type NavItem =
   | "Director"
   | "Library"
   | "Text"
+  | "Image Review"
   | "Final Review"
   | "Publish"
   | "Settings";
@@ -153,8 +157,11 @@ function App() {
   const [productionMessage, setProductionMessage] = useState("");
   const [pipelineBusy, setPipelineBusy] = useState(false);
   const [pipelineMessage, setPipelineMessage] = useState("");
+  const [updateProgress, setUpdateProgress] = useState<UpdateQueueSnapshot>(idleUpdateQueue);
+  const updateControllerRef = useRef<UpdateQueueController | null>(null);
   const [completionOpen, setCompletionOpen] = useState(false);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState("");
+  const [reviewSlideIds, setReviewSlideIds] = useState<string[]>([]);
   const [recentProjects, setRecentProjects] = useState<RecentProject[]>(() => {
     try {
       return JSON.parse(
@@ -500,6 +507,7 @@ function App() {
       slide: (typeof effectiveSlides)[number],
       quality: "low" | "medium" | "high" = "high",
       replaceApproved = false,
+      requestId?: string,
     ) => {
       void quality;
       const plannedSlide = withDesiredFingerprint(ensureCompositionPlan(generateEditorialLayouts([slide], project.approvedAssetManifest.filter(asset=>asset.slideId===slide.id), resolveProjectCTA(project))[0]));
@@ -541,6 +549,7 @@ Production style: ${project.productionStyle.posterPromptStyle}`;
         ),
         compositionPlan: plannedSlide.compositionPlan!,
         layoutFingerprint: desiredLayoutFingerprint,
+        requestId,
       });
 
       updateSlide(slide.id, {
@@ -550,6 +559,7 @@ Production style: ${project.productionStyle.posterPromptStyle}`;
         layoutWarnings: result.validationResult.warnings,
         compositionFingerprint: desiredLayoutFingerprint,
         workingImageFingerprint: desiredLayoutFingerprint,
+        workingGeneratedAt: new Date().toISOString(),
         lastImagePrompt: result.finalPrompt,
         editorial: plannedSlide.editorial,
         headlineLineBreaks: plannedSlide.headlineLineBreaks,
@@ -991,6 +1001,7 @@ Production style: ${project.productionStyle.posterPromptStyle}`;
               layoutWarnings: generated.validationResult.warnings,
               compositionFingerprint: generated.layoutFingerprint,
               workingImageFingerprint: generated.layoutFingerprint,
+          workingGeneratedAt: new Date().toISOString(),
               approvedImageFingerprint: generated.layoutFingerprint,
               lastImagePrompt: generated.finalPrompt,
             }
@@ -1079,10 +1090,9 @@ Production style: ${project.productionStyle.posterPromptStyle}`;
     const layoutFingerprint = projectLayoutFingerprint({...base,slides:editorialSlides});
     const result = await window.cyberSlideStudio.generateCaptionAssets({
       projectName: effectiveProjectName,
-      slides: editorialSlides.map(({ number, title, body, editorial }) => ({
+      slides: editorialSlides.map(({ number, editorialPackage, editorial }) => ({
         number,
-        title,
-        body,
+        editorialPackage,
         editorial,
       })),
       scenes: base.voiceover.scenes,
@@ -1223,61 +1233,117 @@ Production style: ${project.productionStyle.posterPromptStyle}`;
       setPipelineBusy(false);
     }
   };
-  const updateProjectAssets = async () => {
-    if (pipelineBusy) return;
+  const applyProjectUpdateSettings = (base: Project, settings: UpdateSettings): Project => {
+    const targetIds = new Set(settings.scope === "current" && activeSlide ? [activeSlide.id] : base.slides.map(slide => slide.id));
+    const slides = base.slides.map(slide => targetIds.has(slide.id) ? {
+      ...slide,
+      layoutTemplateId: settings.layoutTemplateId,
+      editorialPackage: { ...slide.editorialPackage, layoutTemplate: settings.layoutTemplateId, manuallyEdited: true },
+      captionSafeZonePercent: settings.safeArea,
+      compositionPlan: createCompositionPlan({ ...slide, captionSafeZonePercent: settings.safeArea }, settings.layoutTemplateId),
+      editorial: null,
+      compositionFingerprint: null,
+      layoutWarnings: slide.background.approvedImagePath ? ["Layout settings changed. Approved image preserved until replacement approval."] : [],
+    } : slide);
+    return {
+      ...base,
+      slides,
+      settings: { ...base.settings, captionSafeZonePercent: settings.safeArea },
+      slideTextOverlay: { ...base.slideTextOverlay, posterStyle: settings.headlineStyle, highlightColor: settings.highlightColor, freshness: null, layoutFingerprint: null },
+      subtitles: { ...base.subtitles, safeAreaPercent: settings.safeArea, freshness: null },
+      pipelineStatus: statusThrough(["script"], "images"),
+    };
+  };
+  const applyProjectUpdateLayout = (settings: UpdateSettings) => setProject(applyProjectUpdateSettings(project, settings));
+  const cancelProjectUpdate = () => {
+    const controller = updateControllerRef.current;
+    if (!controller) return;
+    controller.cancel(window.cyberSlideStudio.cancelOpenAIPosterGeneration);
+    setPipelineMessage("Cancelling active image request and preserving completed Working images...");
+  };
+  const updateProjectAssets = async (settings: UpdateSettings, onlyFailed = false): Promise<ProjectUpdateResult[]> => {
+    if (pipelineBusy) return [];
     setPipelineBusy(true);
+    const controller = new UpdateQueueController();
+    updateControllerRef.current = controller;
+    const startedAt = Date.now();
     try {
-      let slides = generateEditorialLayouts(project.slides, project.approvedAssetManifest, resolveProjectCTA(project))
-        .map(ensureCompositionPlan)
-        .map(withDesiredFingerprint);
-      const staleIds = new Set(deriveLayoutStaleness({ ...project, slides }).staleSlideIds);
-      for (const slide of slides.filter((item) => staleIds.has(item.id))) {
-        setPipelineMessage(`Generating layout-aware Working image for slide ${slide.number}...`);
-        const generated = await generateSlidePoster(slide, "high", true);
-        slides = slides.map((item) => item.id === slide.id ? {
-          ...item,
-          compositionValidation: generated.validationResult,
-          layoutWarnings: generated.validationResult.warnings,
-          compositionFingerprint: generated.layoutFingerprint,
-          workingImageFingerprint: generated.layoutFingerprint,
-          lastImagePrompt: generated.finalPrompt,
-          background: {
-            ...item.background,
-            imagePath: generated.filePath,
-            workingImagePath: generated.filePath,
-            approvedImagePath: item.background.approvedImagePath,
-            approvedAt: item.background.approvedAt,
-            approvalLocked: false,
-          },
-        } : item);
+      const configured = applyProjectUpdateSettings(project, settings);
+      let slides = generateEditorialLayouts(configured.slides, configured.approvedAssetManifest, resolveProjectCTA(configured)).map(ensureCompositionPlan).map(withDesiredFingerprint);
+      const stale = deriveLayoutStaleness({ ...configured, slides });
+      const failedIds = new Set(updateProgress.items.filter(item => item.status === "failed").map(item => item.slideId));
+      const targetIds = settings.scope === "current" && activeSlide ? new Set([activeSlide.id]) : new Set(stale.staleSlideIds);
+      const targets = slides.filter(slide => targetIds.has(slide.id) && (!onlyFailed || failedIds.has(slide.id)));
+      const queueItems = targets.map(slide => ({ slideId:slide.id,slideNumber:slide.number,title:slide.title,status:"pending" as const,error:null,elapsedMs:0 }));
+      setUpdateProgress({ running:true,cancelled:false,stage:"Preparing composition prompts",startedAt,currentSlide:null,items:queueItems });
+      const completed = new Map<string, Awaited<ReturnType<typeof generateSlidePoster>>>();
+      if (import.meta.env.DEV) console.info("[ProjectUpdate] selected layout", { layoutTemplateId:settings.layoutTemplateId,scope:settings.scope,slides:targets.map(slide=>slide.number),concurrency:settings.concurrency,timeoutSeconds:settings.timeoutSeconds });
+      const finalItems = await runControlledUpdateQueue({
+        items:queueItems,
+        concurrency:settings.concurrency,
+        timeoutMs:settings.timeoutSeconds*1000,
+        controller,
+        cancelRequest:window.cyberSlideStudio.cancelOpenAIPosterGeneration,
+        onChange:(items,currentSlide,stage)=>setUpdateProgress({ running:true,cancelled:controller.cancelled,stage,startedAt,currentSlide,items }),
+        execute:async(item,requestId)=>{
+          const slide=slides.find(value=>value.id===item.slideId);
+          if(!slide)throw new Error("Slide disappeared from the update queue.");
+          if(import.meta.env.DEV)console.info("[ProjectUpdate] prompt construction start",{requestId,slideNumber:slide.number,layout:slide.layoutTemplateId});
+          const result=await generateSlidePoster(slide,"high",true,requestId);
+          await window.cyberSlideStudio.readSlideImage(result.filePath);
+          completed.set(slide.id,result);
+          if(import.meta.env.DEV)console.info("[ProjectUpdate] completion",{requestId,slideNumber:slide.number,filePath:result.filePath});
+        },
+      });
+      slides=slides.map(slide=>{const generated=completed.get(slide.id);return generated?{...slide,compositionValidation:generated.validationResult,layoutWarnings:generated.validationResult.warnings,compositionFingerprint:generated.layoutFingerprint,workingImageFingerprint:generated.layoutFingerprint,lastImagePrompt:generated.finalPrompt,background:{...slide.background,imagePath:generated.filePath,workingImagePath:generated.filePath,approvedImagePath:slide.background.approvedImagePath,approvedAt:slide.background.approvedAt,approvalLocked:false}}:slide});
+      let next:Project={...configured,slides,slideTextOverlay:{...configured.slideTextOverlay,freshness:null,layoutFingerprint:null},pipelineStatus:statusThrough(["script"],"images")};
+      if(!controller.cancelled){
+        if(!next.voiceover.narrationPath||next.voiceover.sourceFingerprint!==voiceInputFingerprint(next))next=await runVoiceStage(next);
+        if(next.voiceover.scenes.length)next=await runCaptionStage(next,true);
       }
-      let next: Project = {
-        ...project,
-        slides,
-        slideTextOverlay: { ...project.slideTextOverlay, freshness: null, layoutFingerprint: null },
-        pipelineStatus: staleIds.size ? statusThrough(["script"], "images") : statusThrough(["script", "images", "voice", "music"], "video"),
-      };
-      if (!next.voiceover.narrationPath || next.voiceover.sourceFingerprint !== voiceInputFingerprint(next)) {
-        next = await runVoiceStage(next);
-      }
-      if (next.voiceover.scenes.length) {
-        next = await runCaptionStage(next, true);
-      } else {
-        next = { ...next, subtitles: { ...next.subtitles, freshness: null } };
-      }
-      next = {
-        ...next,
-        pipelineStatus: staleIds.size ? statusThrough(["script"], "images") : statusThrough(["script", "images", "voice", "music"], "video"),
-      };
       setProject(next);
-      setPipelineMessage(staleIds.size
-        ? "Project updated. Review and approve the replacement Working images before rendering."
-        : "Editorial and caption assets updated. The final video is ready to rebuild.");
-    } catch (error) {
-      setPipelineMessage(error instanceof Error ? error.message : "Project update failed.");
+      setUpdateProgress({running:false,cancelled:controller.cancelled,stage:controller.cancelled?"Cancelled":"Update complete",startedAt,currentSlide:null,items:finalItems});
+      const successfulIds=finalItems.filter(item=>item.status==="completed"&&completed.has(item.slideId)).map(item=>item.slideId);
+      if(successfulIds.length){setReviewSlideIds(successfulIds);selectSlide(successfulIds[0]);setActiveNav("Image Review");}
+      setPipelineMessage(controller.cancelled?"Update cancelled. Completed Working images were preserved.":finalItems.some(item=>item.status==="failed")?"Update finished with failed slides. Review errors or retry them.":"Working images and editorial assets updated. Approve replacements before rendering.");
+      return finalItems.map(item=>{const slide=next.slides.find(value=>value.id===item.slideId);return {success:item.status==="completed"&&Boolean(slide?.background.workingImagePath),slideId:item.slideId,workingImagePath:slide?.background.workingImagePath||null,approvedImagePath:slide?.background.approvedImagePath||null,warnings:slide?.layoutWarnings||[],validationResult:slide?.compositionValidation||null,error:item.error};});
+    } catch(error){
+      setUpdateProgress(current=>({...current,running:false,stage:"Update failed",items:current.items.map(item=>item.status==="active"?{...item,status:"failed",error:error instanceof Error?error.message:"Update failed."}:item)}));
+      setPipelineMessage(error instanceof Error?error.message:"Project update failed.");
+      if(import.meta.env.DEV)console.error("[ProjectUpdate] failure",error);
+      return [{success:false,slideId:activeSlide?.id||"",workingImagePath:null,approvedImagePath:activeSlide?.background.approvedImagePath||null,warnings:[],validationResult:null,error:error instanceof Error?error.message:"Project update failed."}];
     } finally {
+      updateControllerRef.current=null;
       setPipelineBusy(false);
     }
+  };
+  const advanceImageReview = (slideId: string) => {
+    const nextId=nextReviewSlideId(reviewSlideIds,slideId);
+    if(nextId)selectSlide(nextId);else setPipelineMessage("Image review complete. Approve any remaining replacements when ready.");
+  };
+  const approveReviewReplacement = async (slide: Project["slides"][number]) => {
+    if(!slide.background.workingImagePath)throw new Error("No Working image exists for this slide.");
+    await window.cyberSlideStudio.readSlideImage(slide.background.workingImagePath);
+    const approved=await window.cyberSlideStudio.approveSlideImage({sourcePath:slide.background.workingImagePath,slideNumber:slide.number,projectName:effectiveProjectName});
+    let next:Project=applyApprovedReplacement(project,slide.id,approved.filePath,approved.approvedAt);
+    next={...next,approvedAssetManifest:directMotions(next.slides.filter(item=>item.background.approvedImagePath).map(item=>({slideId:item.id,slideNumber:item.number,path:item.background.approvedImagePath as string,title:item.title,body:item.body})),next.productionStyle.name)};
+    if(next.voiceover.scenes.length)await runCaptionStage(next,true);else setProject(next);
+    advanceImageReview(slide.id);
+  };
+  const regenerateReviewSlide = async (slide: Project["slides"][number]) => {
+    const result=await generateSlidePoster(slide,"high",true);
+    await window.cyberSlideStudio.readSlideImage(result.filePath);
+    setPipelineMessage(`New Working image generated for Slide ${slide.number}.`);
+  };
+  const keepExistingApproval = (slide: Project["slides"][number]) => {
+    setPipelineMessage(`Kept the existing Approved image for Slide ${slide.number}. The Working image remains available.`);
+    advanceImageReview(slide.id);
+  };
+  const previewSelectedLayout = () => {
+    if(!activeSlide)return;
+    setReviewSlideIds([activeSlide.id]);
+    selectSlide(activeSlide.id);
+    setActiveNav("Image Review");
   };
   const rebuildLayoutAndRender = async () => {
     if (pipelineBusy) return;
@@ -1411,8 +1477,8 @@ Production style: ${project.productionStyle.posterPromptStyle}`;
         />
       )}
 
-      {activeNav !== "Home" && (
-        <ProjectUpdatePanel project={project} busy={pipelineBusy} onUpdate={updateProjectAssets} />
+      {activeNav !== "Home" && activeNav !== "Image Review" && (
+        <ProjectUpdatePanel project={project} selectedSlideId={activeSlide?.id ?? null} progress={updateProgress} onApply={applyProjectUpdateLayout} onPreview={previewSelectedLayout} onUpdate={updateProjectAssets} onCancel={cancelProjectUpdate} />
       )}
 
       {activeNav === "Home" ? (
@@ -1427,7 +1493,19 @@ Production style: ${project.productionStyle.posterPromptStyle}`;
           onNew={() => void handleNewProject()}
           onRecent={(item) => void handleOpenRecentProject(item)}
         />
-      ) : activeNav === "Final Review" && project.finalRender && !deriveLayoutStaleness(project).videoStale ? (
+      ) : activeNav === "Image Review" && activeSlide ? (
+        <WorkingImageReview
+          key={activeSlide.id}
+          project={project}
+          slideId={activeSlide.id}
+          reviewSlideIds={reviewSlideIds.length ? reviewSlideIds : [activeSlide.id]}
+          onSelect={selectSlide}
+          onApprove={approveReviewReplacement}
+          onRegenerate={regenerateReviewSlide}
+          onKeep={keepExistingApproval}
+          onEdit={() => setActiveNav("Text")}
+          onClose={() => setActiveNav("Scripts")}
+        />      ) : activeNav === "Final Review" && project.finalRender && !deriveLayoutStaleness(project).videoStale ? (
         <FinalReviewScreen
           project={project}
           videoUrl={videoPreviewUrl}

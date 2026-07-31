@@ -314,8 +314,7 @@ function overlayFreshness(slides, scenes, settings) {
   return hash({
     slides: slides.map((slide) => ({
       number: slide.number,
-      title: slide.title,
-      body: slide.body,
+      editorialPackage: slide.editorialPackage,
       editorial: slide.editorial,
     })),
     scenes: scenes.map((scene) => ({
